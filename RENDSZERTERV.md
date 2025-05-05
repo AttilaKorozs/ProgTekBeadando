@@ -35,47 +35,54 @@ A harmadik féltől származó ROME könyvtárat az RSS XML feldolgozására has
 
 A következő mappastruktúra mutatja be, hogyan szervezzük a forráskódot a `src` alatt. Ezzel könnyen megtalálhatók a rétegek és komponensek.
 
+
+
 ```
-src/
-├─ main/
-│  ├─ java/
-│  │  ├─ app/
-│  │  │  └─ App.java                # Belépési pont
-│  │  ├─ controller/
-│  │  │  ├─ MainController.java     # Főablak eseménykezelése
-│  │  │  ├─ FeedController.java     # Feed kezelő nézet logikája
-│  │  │  └─ ArticleController.java  # Cikk nézet logikája
-│  │  ├─ model/
-│  │  │  ├─ Feed.java
-│  │  │  ├─ Article.java
-│  │  │  ├─ User.java
-│  │  │  └─ UserArticle.java
-│  │  ├─ service/
-│  │  │  ├─ FeedService.java        # Üzleti logika a feedekhez
-│  │  │  └─ ArticleService.java     # Üzleti logika a cikkekhez
-│  │  ├─ dao/
-│  │  │  ├─ FeedDAO.java
-│  │  │  ├─ ArticleDAO.java
-│  │  │  ├─ UserDAO.java
-│  │  │  └─ UserArticleDAO.java
-│  │  └─ util/
-│  │     ├─ RssParser.java          # Adapter a ROME és modell között
-│  │     └─ NotificationUtil.java   # Értesítések megjelenítése
-│  └─ resources/
-│     ├─ fxml/
-│     │  ├─ main.fxml
-│     │  ├─ feed.fxml
-│     │  └─ article.fxml
-│     └─ application.properties      # DB kapcsolati adatok
-└─ test/
-   ├─ java/
-   │  ├─ dao/
-   │  │  ├─ FeedDAOTest.java        # Unit tesztek a DAO réteghez
-   │  │  └─ ArticleDAOTest.java
-   │  └─ service/
-   │     └─ FilterStrategyTest.java # Szűrési logika tesztjei
-   └─ resources/
+├─ pom.xml                             # Maven projekt fájl (függőségek, build konfiguráció)
+├─ src/
+│  ├─ main/
+│  │  ├─ java/
+│  │  │  └─ org/
+│  │  │     └─ rrsreader/              # Maven groupId szerinti csomag
+│  │  │        ├─ App.java             # Belépési pont
+│  │  │        ├─ controller/
+│  │  │        │  ├─ MainController.java
+│  │  │        │  ├─ FeedController.java
+│  │  │        │  └─ ArticleController.java
+│  │  │        ├─ model/
+│  │  │        │  ├─ Feed.java
+│  │  │        │  ├─ Article.java
+│  │  │        │  ├─ User.java
+│  │  │        │  └─ UserArticle.java
+│  │  │        ├─ service/
+│  │  │        │  ├─ FeedService.java
+│  │  │        │  └─ ArticleService.java
+│  │  │        ├─ dao/
+│  │  │        │  ├─ FeedDAO.java
+│  │  │        │  ├─ ArticleDAO.java
+│  │  │        │  ├─ UserDAO.java
+│  │  │        │  └─ UserArticleDAO.java
+│  │  │        └─ util/
+│  │  │           ├─ RssParser.java
+│  │  │           └─ NotificationUtil.java
+│  │  └─ resources/
+│  │     ├─ fxml/
+│  │     │  ├─ main.fxml
+│  │     │  ├─ feed.fxml
+│  │     │  └─ article.fxml
+│  │     └─ application.properties
+│  └─ test/
+│     ├─ java/
+│     │  └─ org/
+│     │     └─ rrsreader/
+│     │        ├─ dao/
+│     │        │  ├─ FeedDAOTest.java
+│     │        │  └─ ArticleDAOTest.java
+│     │        └─ service/
+│     │           └─ FilterStrategyTest.java
+│     └─ resources/
 ```
+
 
 ### 3. Adatbázismodell és táblák
 
