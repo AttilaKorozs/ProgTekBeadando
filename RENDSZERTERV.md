@@ -57,7 +57,7 @@ A következő mappastruktúra mutatja be, hogyan szervezzük a forráskódot a `
 │  │  │        ├─ service/
 │  │  │        │  ├─ FeedService.java
 │  │  │        │  └─ ArticleService.java
-│  │  │        ├─ dao/
+│  │  │        ├─ org.rssreader.dao/
 │  │  │        │  ├─ FeedDAO.java
 │  │  │        │  ├─ ArticleDAO.java
 │  │  │        │  ├─ UserDAO.java
@@ -75,7 +75,7 @@ A következő mappastruktúra mutatja be, hogyan szervezzük a forráskódot a `
 │     ├─ java/
 │     │  └─ org/
 │     │     └─ rrsreader/
-│     │        ├─ dao/
+│     │        ├─ org.rssreader.dao/
 │     │        │  ├─ FeedDAOTest.java
 │     │        │  └─ ArticleDAOTest.java
 │     │        └─ service/

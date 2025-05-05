@@ -1,4 +1,4 @@
-package dao;
+package org.rssreader.dao;
 
 public class UserDAO {
 
