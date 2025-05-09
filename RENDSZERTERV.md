@@ -57,7 +57,7 @@ A következő mappastruktúra mutatja be, hogyan szervezzük a forráskódot a `
 │  │  │        ├─ service/
 │  │  │        │  ├─ FeedService.java
 │  │  │        │  └─ ArticleService.java
-│  │  │        ├─ org.rssreader.dao/
+│  │  │        ├─ dao/
 │  │  │        │  ├─ FeedDAO.java
 │  │  │        │  ├─ ArticleDAO.java
 │  │  │        │  ├─ UserDAO.java
@@ -75,7 +75,7 @@ A következő mappastruktúra mutatja be, hogyan szervezzük a forráskódot a `
 │     ├─ java/
 │     │  └─ org/
 │     │     └─ rrsreader/
-│     │        ├─ org.rssreader.dao/
+│     │        ├─ dao/
 │     │        │  ├─ FeedDAOTest.java
 │     │        │  └─ ArticleDAOTest.java
 │     │        └─ service/
@@ -124,14 +124,14 @@ A MariaDB adatbázisban az alábbi négy tábla található, melyek a feedek, ci
 | ------------- | ---------------------------------------------------------------- | ---------------------------------------------------- |
 | `user_id`     | `INT NOT NULL`                                                   | Hivatkozás a `User.id` mezőre (Idegen kulcs)         |
 | `article_id`  | `INT NOT NULL`                                                   | Hivatkozás az `Article.id` mezőre (Idegen kulcs)     |
-| `is_favorite` | `BOOLEAN DEFAULT FALSE`                                          | Jelzi, ha a felhasználó kedvencként jelölte a cikket |
-| `is_read`     | `BOOLEAN DEFAULT FALSE`                                          | Jelzi, ha a felhasználó olvasottnak jelölte a cikket |
+| `is_favorite` | `TINYINT(1) DEFAULT 0`                                           | Jelzi, ha a felhasználó kedvencként jelölte a cikket |
+| `is_read`     | `TINYINT(1) DEFAULT 0`                                           | Jelzi, ha a felhasználó olvasottnak jelölte a cikket |
 | `updated_at`  | `DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP` | Az utolsó státuszváltozás időpontja                  |
 
 **Kapcsolatok és indexek**
 
-- **Feed → Article (1**\*\*:N\*\*\*\*)\*\*: Egy feedhez több cikk tartozhat.
-- **User → Article (N**\*\*:M\*\*\*\*)\*\*: A `UserArticle` tábla kezeli a kedvencek és olvasotti státuszokat.
+- **Feed → Article**: Egy feedhez több cikk tartozhat.
+- **User → Article**: A `UserArticle` tábla kezeli a kedvencek és olvasotti státuszokat.
 - A `user_id` és `article_id` mezőkön közös primer kulcs vagy egyedi index biztosítja a sok-sok kapcsolat kezelését.
 - Idegen kulcsokkal garantáljuk a referenciális integritást.
 
