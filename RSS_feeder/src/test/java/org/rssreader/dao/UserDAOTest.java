@@ -1,10 +1,9 @@
-package dao;
+package org.rssreader.dao;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.Test;
-import org.rssreader.dao.UserDAO;
 import org.rssreader.models.User;
 
 public class UserDAOTest {
