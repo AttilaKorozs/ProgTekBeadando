@@ -2,7 +2,7 @@ package org.rssreader.models;
 
 public class User {
 
-    private String username;
+    private final String username;
     private String password;
     private String email;
 

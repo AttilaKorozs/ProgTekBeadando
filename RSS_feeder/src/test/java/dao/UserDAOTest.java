@@ -3,20 +3,14 @@ package dao;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.rssreader.dao.UserDAO;
 import org.rssreader.models.User;
 
 public class UserDAOTest {
 
-    private static User TestUser;
+    private static User TestUser= new User("teszt", "tesztpass", "teszt@teszt.hu");
     
-    @BeforeAll
-    static void Setup() {
-        TestUser = new User("teszt", "tesztpass", "teszt@teszt.hu");
-    }
-
     @Test
     void TestUserDAO(){
         assertNull(UserDAO.authUser(TestUser));
