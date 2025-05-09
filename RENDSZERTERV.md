@@ -110,19 +110,18 @@ A MariaDB adatbázisban az alábbi négy tábla található, melyek a feedek, ci
 
 #### 3.3 User tábla
 
-| Oszlop neve     | Típus                                | Leírás                           |
-| --------------- | ------------------------------------ | -------------------------------- |
-| `id`            | `INT AUTO_INCREMENT`                 | A felhasználó egyedi azonosítója |
-| `username`      | `VARCHAR(100) NOT NULL`              | Bejelentkezési név               |
-| `password_hash` | `VARCHAR(255) NOT NULL`              | Titkosított jelszó (bcrypt hash) |
-| `email`         | `VARCHAR(255) NOT NULL`              | E-mail cím                       |
-| `created_at`    | `DATETIME DEFAULT CURRENT_TIMESTAMP` | Regisztráció időpontja           |
+| Oszlop neve     | Típus                                | Leírás                                  |
+| --------------- | ------------------------------------ | --------------------------------        |
+| `username`      | `VARCHAR(100) NOT NULL`              | A felhasználó egyedi Bejelentkezési neve|
+| `password_hash` | `VARCHAR(255) NOT NULL`              | Titkosított jelszó (bcrypt hash)        |
+| `email`         | `VARCHAR(255) NOT NULL`              | E-mail cím                              |
+| `created_at`    | `DATETIME DEFAULT CURRENT_TIMESTAMP` | Regisztráció időpontja                  |
 
 #### 3.4 UserArticle tábla
 
 | Oszlop neve   | Típus                                                            | Leírás                                               |
 | ------------- | ---------------------------------------------------------------- | ---------------------------------------------------- |
-| `user_id`     | `INT NOT NULL`                                                   | Hivatkozás a `User.id` mezőre (Idegen kulcs)         |
+| `user`        | `VARCHAR(100) NOT NULL`                                          | Hivatkozás a `User.username` mezőre (Idegen kulcs)   |
 | `article_id`  | `INT NOT NULL`                                                   | Hivatkozás az `Article.id` mezőre (Idegen kulcs)     |
 | `is_favorite` | `TINYINT(1) DEFAULT 0`                                           | Jelzi, ha a felhasználó kedvencként jelölte a cikket |
 | `is_read`     | `TINYINT(1) DEFAULT 0`                                           | Jelzi, ha a felhasználó olvasottnak jelölte a cikket |
