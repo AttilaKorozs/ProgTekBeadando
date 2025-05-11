@@ -3,25 +3,22 @@ package org.rssreader.models;
 import java.time.LocalDateTime;
 
 public class Article {
+    private final int id;
+    private final int feedId;
+    private final String title;
+    private final LocalDateTime publicationDate;
+    private final String content;
 
-    private int id;
-    private int feedId;
-    private String title;
-    private String link;
-    private String content;
-    private LocalDateTime publicationDate;
-
-    public Article(int id, int feedId, String title, String link, LocalDateTime publicationDate, String content) {
+    public Article(int id, int feedId, String title, LocalDateTime publicationDate, String content) {
         this.id = id;
         this.feedId = feedId;
         this.title = title;
-        this.link = link;
         this.publicationDate = publicationDate;
         this.content = content;
     }
 
-    public Article(int feedId, String title, String link, LocalDateTime publicationDate, String content) {
-        this(0, feedId, title, link, publicationDate, content);
+    public int getId() {
+        return id;
     }
 
     public int getFeedId() {
@@ -32,20 +29,16 @@ public class Article {
         return title;
     }
 
-    public String getLink() {
-        return link;
+    public LocalDateTime getPublicationDate() {
+        return publicationDate;
     }
 
     public String getContent() {
         return content;
     }
 
-    public LocalDateTime getPublicationDate() {
-        return publicationDate;
+    @Override
+    public String toString() {
+        return title;
     }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
 }

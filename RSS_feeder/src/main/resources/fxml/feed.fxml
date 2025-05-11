@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<BorderPane xmlns="http://javafx.com/javafx/20" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.rssreader.controller.FeedController">
+    <top>
+        <ToolBar>
+            <Button text="Új feed" onAction="#onAddFeed" />
+            <Button text="Törlés" onAction="#onDeleteFeed" />
+        </ToolBar>
+    </top>
+    <center>
+        <TableView fx:id="feedTable">
+            <columns>
+                <TableColumn text="ID" fx:id="colId" />
+                <TableColumn text="Név" fx:id="colName" />
+                <TableColumn text="URL" fx:id="colUrl" />
+                <TableColumn text="Frissítés (perc)" fx:id="colInterval" />
+            </columns>
+        </TableView>
+    </center>
+</BorderPane>

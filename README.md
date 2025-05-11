@@ -8,3 +8,10 @@ Egy asztali alkalmazást készítettünk JavaFX használatával, amely lehetőv�
 ### Készítők
 - Borbás Péter
 - Korózs Attila
+
+
+
+### Notes
+Indítás configurációs fájlal : maven ->config parancs: clean javafx:run
+Vagy telepítesz mavent a gépedre és úgy, vagy intellij ben execute maven goal között kikeresed
+

@@ -17,7 +17,7 @@ public class ArticleDAO {
 
             stmt.setInt(1, article.getFeedId());
             stmt.setString(2, article.getTitle());
-            stmt.setString(3, article.getLink());
+           // stmt.setString(3, article.getLink());
             stmt.setTimestamp(4, Timestamp.valueOf(article.getPublicationDate()));
             stmt.setString(5, article.getContent());
 
@@ -29,7 +29,7 @@ public class ArticleDAO {
 
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    article.setId(generatedKeys.getInt(1));
+           //         article.setId(generatedKeys.getInt(1));
                 } else {
                     throw new SQLException("Nem sikerült lekérni a generált kulcsot.");
                 }
