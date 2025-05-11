@@ -1,10 +1,21 @@
 package org.rssreader;
 
-public class App {
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
-    public static void main(String[] args){
+public class App extends Application {
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
+        Scene scene = new Scene(loader.load());
+        primaryStage.setTitle("RSS Feeder");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
 
-        System.out.println("Hello mindenki!");
-		
+    public static void main(String[] args) {
+        launch(args);
     }
 }
