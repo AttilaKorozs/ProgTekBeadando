@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.Test;
 import org.rssreader.models.User;
 
-/*public class UserDAOTest {
+public class UserDAOTest {
 
     private static User TestUser= new User("teszt", "tesztpass", "teszt@teszt.hu");
     
@@ -25,4 +25,4 @@ import org.rssreader.models.User;
         assertNull(UserDAO.authUser(TestUser));
     }
 }
-*/
+

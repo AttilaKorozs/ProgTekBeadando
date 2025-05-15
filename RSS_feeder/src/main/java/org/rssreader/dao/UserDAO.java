@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import org.mindrot.jbcrypt.BCrypt;
 import org.rssreader.models.User;
 
-/*public class UserDAO {
+public class UserDAO {
 
     public static void addUser(User user) {
         String sql = "INSERT INTO User (username, password_hash, email) VALUES (?, ?, ?)";
@@ -81,4 +81,3 @@ import org.rssreader.models.User;
 
     }
 }
-*/
