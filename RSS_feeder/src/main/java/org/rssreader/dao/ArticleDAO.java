@@ -12,12 +12,12 @@ import org.rssreader.models.Article;
 public class ArticleDAO {
 
     public static void storeArticle(Article article) {
-        String sql = "INSERT INTO Article (feed_id, title, link, publication_date, content) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Article (feed_id, title, link, publication_date, content) VALUES (?, ?, ?, ?,?)";
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setInt(1, article.getFeedId());
             stmt.setString(2, article.getTitle());
-           // stmt.setString(3, article.getLink());
+            stmt.setString(3, article.getLink());
             stmt.setTimestamp(4, Timestamp.valueOf(article.getPublicationDate()));
             stmt.setString(5, article.getContent());
 
