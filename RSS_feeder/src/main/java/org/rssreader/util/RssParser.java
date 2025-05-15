@@ -6,8 +6,7 @@ import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 import org.rssreader.models.Article;
-
-import java.net.URL;
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -15,8 +14,8 @@ import java.util.stream.Collectors;
 
 public class RssParser {
     public List<Article> parse(String feedUrl, int feedId) throws Exception {
-        URL url = new URL(feedUrl);
-        SyndFeed feed = new SyndFeedInput().build(new XmlReader(url));
+        URI uri = new URI(feedUrl);
+        SyndFeed feed = new SyndFeedInput().build(new XmlReader(uri.toURL()));
         return feed.getEntries().stream()
                 .map(entry -> toArticle(entry, feedId))
                 .collect(Collectors.toList());
