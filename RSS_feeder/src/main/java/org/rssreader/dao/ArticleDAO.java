@@ -12,7 +12,7 @@ import org.rssreader.models.Article;
 public class ArticleDAO {
 
     public static void storeArticle(Article article) {
-        String sql = "INSERT INTO Article (feed_id, title, link, publication_date, content) VALUES (?, ?, ?, ?,?)";
+        String sql = "INSERT INTO Article (feed_id, title, link, publication_date, content) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setInt(1, article.getFeedId());
@@ -29,7 +29,7 @@ public class ArticleDAO {
 
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-           //         article.setId(generatedKeys.getInt(1));
+                    article.setId(generatedKeys.getInt(1));
                 } else {
                     throw new SQLException("Nem sikerült lekérni a generált kulcsot.");
                 }

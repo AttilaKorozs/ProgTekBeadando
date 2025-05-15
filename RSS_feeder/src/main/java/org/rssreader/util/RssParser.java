@@ -36,6 +36,7 @@ public class RssParser {
                 0,
                 feedId,
                 entry.getTitle(),
+                "www.alma.hu",
                 entry.getPublishedDate() != null
                         ? entry.getPublishedDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
                         : LocalDateTime.now(),

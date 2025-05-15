@@ -7,10 +7,10 @@ import org.rssreader.models.Article;
 
 public class ArticleDAOTest {
 
-    //private static final Article TestArticle = new Article(1, "tesztTitle", "http://teszt.link", LocalDateTime.now(), "Hatalmas Teszt Content");
+    private static final Article TestArticle = new Article(1, "Hatalmas Teszt Link", "http://teszt.link", LocalDateTime.now(),"Szuper Content");
 
-    //@Test
-    //void testStoreArticle() {
-   //     ArticleDAO.storeArticle(TestArticle);
-   // }
+    @Test
+    void testStoreArticle() {
+        ArticleDAO.storeArticle(TestArticle);
+    }
 }
