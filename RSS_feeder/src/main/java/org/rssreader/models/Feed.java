@@ -1,13 +1,15 @@
 package org.rssreader.models;
 
+import java.net.URI;
+
 public class Feed {
     private final String name;
-    private final String url;
+    private final URI uri;
     private final int refreshIntervalMin;
 
-    public Feed(String name, String url, int refreshIntervalMin) {
+    public Feed(String name, URI uri, int refreshIntervalMin) {
         this.name = name;
-        this.url = url;
+        this.uri = uri;
         this.refreshIntervalMin = refreshIntervalMin;
     }
 
@@ -15,8 +17,8 @@ public class Feed {
         return name;
     }
 
-    public String getUrl() {
-        return url;
+    public URI getUri() {
+        return uri;
     }
 
     public int getRefreshIntervalMin() {

@@ -1,5 +1,6 @@
 package org.rssreader.dao;
 
+import java.net.URI;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,7 +17,7 @@ public class FeedDAO {
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, feed.getName());
-            stmt.setString(2, feed.getUrl());
+            stmt.setString(2, feed.getUri().toString());
             stmt.setInt(3, feed.getRefreshIntervalMin());
 
             stmt.executeUpdate();
@@ -36,7 +37,7 @@ public class FeedDAO {
             while (rs.next()) {
                 Feed feed = new Feed(
                         rs.getString("name"),
-                        rs.getString("url"),
+                        new URI(rs.getString("url")),
                         rs.getInt("refresh_interval_min"));
                 feeds.add(feed);
             }
@@ -55,7 +56,7 @@ public class FeedDAO {
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, feed.getUrl());
+            stmt.setString(1, feed.getUri().toString());
 
             int affectedRows = stmt.executeUpdate();
             return affectedRows > 0;
