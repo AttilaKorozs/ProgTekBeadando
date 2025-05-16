@@ -8,21 +8,20 @@ import org.rssreader.models.User;
 
 public class UserDAOTest {
 
-    private static User TestUser= new User("teszt", "tesztpass", "teszt@teszt.hu");
     
     @Test
     void TestUserDAO(){
-        assertNull(UserDAO.authUser(TestUser));
-        UserDAO.addUser(TestUser);
-        assertNotNull(UserDAO.authUser(TestUser));
-        TestUser=new User("teszt", "masikpass", "masik@teszt.hu");
+        assertNull(UserDAO.authUser(TestData.TestUser));
+        UserDAO.addUser(TestData.TestUser);
+        assertNotNull(UserDAO.authUser(TestData.TestUser));
+        TestData.TestUser=new User("teszt", "masikpass", "masik@teszt.hu");
 
-        UserDAO.modifyUser(TestUser);
-        User userToCheck = UserDAO.authUser(TestUser);
-        assertEquals(userToCheck, TestUser);
+        UserDAO.modifyUser(TestData.TestUser);
+        User userToCheck = UserDAO.authUser(TestData.TestUser);
+        assertEquals(userToCheck, TestData.TestUser);
 
-        UserDAO.deleteUser(TestUser);
-        assertNull(UserDAO.authUser(TestUser));
+        UserDAO.deleteUser(TestData.TestUser);
+        assertNull(UserDAO.authUser(TestData.TestUser));
     }
 }
 
