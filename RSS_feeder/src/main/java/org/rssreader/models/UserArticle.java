@@ -2,23 +2,25 @@ package org.rssreader.models;
 
 import java.time.LocalDateTime;
 
+import org.rssreader.dao.UserArticleDAO;
+
 public class UserArticle {
-    private final String username;
+    private final User user;
     private final Article article;
-    private final boolean isFavorite;
-    private final boolean isRead;
+    private boolean isFavorite;
+    private boolean isRead;
     private final LocalDateTime updatedAt;
 
-    public UserArticle(String username, Article article, boolean isFavorite, boolean isRead, LocalDateTime updatedAt) {
-        this.username = username;
+    public UserArticle(User user, Article article, boolean isFavorite, boolean isRead, LocalDateTime updatedAt) {
+        this.user = user;
         this.article = article;
         this.isFavorite = isFavorite;
         this.isRead = isRead;
         this.updatedAt = updatedAt;
     }
 
-    public String getUsername() {
-        return username;
+    public User getUsername() {
+        return user;
     }
 
     public Article getArticle() {
@@ -37,8 +39,17 @@ public class UserArticle {
         return updatedAt;
     }
 
+    public void setRead() {
+        if (UserArticleDAO.setRead(user, article))
+            isRead=true;
+    }
+    public void setFavorite() {
+        if (UserArticleDAO.setFavorite(user, article))
+            isFavorite=true;
+    }
+
     @Override
     public String toString() {
-        return username + "-" + article;
+        return user.getUsername() + "-" + article;
     }
 }
