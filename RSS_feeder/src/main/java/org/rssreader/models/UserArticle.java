@@ -4,14 +4,14 @@ import java.time.LocalDateTime;
 
 public class UserArticle {
     private final String username;
-    private final int articleId;
+    private final Article article;
     private final boolean isFavorite;
     private final boolean isRead;
     private final LocalDateTime updatedAt;
 
-    public UserArticle(String username, int articleId, boolean isFavorite, boolean isRead, LocalDateTime updatedAt) {
+    public UserArticle(String username, Article article, boolean isFavorite, boolean isRead, LocalDateTime updatedAt) {
         this.username = username;
-        this.articleId = articleId;
+        this.article = article;
         this.isFavorite = isFavorite;
         this.isRead = isRead;
         this.updatedAt = updatedAt;
@@ -21,8 +21,8 @@ public class UserArticle {
         return username;
     }
 
-    public int getArticleId() {
-        return articleId;
+    public Article getArticle() {
+        return article;
     }
 
     public boolean isFavorite() {
@@ -39,6 +39,6 @@ public class UserArticle {
 
     @Override
     public String toString() {
-        return username + "-" + articleId;
+        return username + "-" + article;
     }
 }

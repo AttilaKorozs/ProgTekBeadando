@@ -1,5 +1,6 @@
 package org.rssreader.dao;
 
+import java.net.URI;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,17 +11,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.rssreader.models.Article;
+import org.rssreader.models.Feed;
 
 public class ArticleDAO {
 
     public static void storeArticle(Article article) {
-        String sql = "INSERT INTO Article (feed_id, title, link, publication_date, content) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Article (feed_url, title, link, publication_date, content) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            stmt.setInt(1, article.getFeedId());
+            stmt.setString(1, article.getFeedUri().toString());
             stmt.setString(2, article.getTitle());
-            stmt.setString(3, article.getLink());
+            stmt.setString(3, article.getLink().toString());
             stmt.setTimestamp(4, Timestamp.valueOf(article.getPublicationDate()));
             stmt.setString(5, article.getContent());
 
@@ -43,21 +45,21 @@ public class ArticleDAO {
         }
     }
 
-    public static List<Article> getArticle(int feedId) {
-        String sql = "SELECT id, feed_id, title, link, publication_date, content FROM Article WHERE feed_id = ?";
+    public static List<Article> getArticle(Feed feed) {
+        String sql = "SELECT * FROM Article WHERE feed_url = ?";
         List<Article> articles = new ArrayList<>();
 
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, feedId);
+            stmt.setString(1, feed.getUri().toString());
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Article article = new Article(rs.getInt("id"),
-                            rs.getInt("feed_id"),
+                            new URI(rs.getString("feed_url")),
                             rs.getString("title"),
-                            rs.getString("link"),
+                            new URI(rs.getString("link")),
                             rs.getTimestamp("publication_date").toLocalDateTime(),
                             rs.getString("content"));
                     articles.add(article);

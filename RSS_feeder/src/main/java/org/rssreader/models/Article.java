@@ -1,35 +1,36 @@
 package org.rssreader.models;
 
+import java.net.URI;
 import java.time.LocalDateTime;
 
 public class Article {
     private int id;
-    private final int feedId;
+    private final URI feedUri;
     private final String title;
-    private final String link;
+    private final URI link;
     private final LocalDateTime publicationDate;
     private final String content;
 
 
-    public Article(int id, int feedId, String title, String link, LocalDateTime publicationDate, String content) {
+    public Article(int id, URI feedUri, String title, URI link, LocalDateTime publicationDate, String content) {
         this.id = id;
-        this.feedId = feedId;
+        this.feedUri = feedUri;
         this.title = title;
         this.link = link;
         this.publicationDate = publicationDate;
         this.content = content;
     }
 
-    public Article(int feedId, String title, String link, LocalDateTime publicationDate, String content) {
-        this(0, feedId, title, link, publicationDate, content);
+    public Article(URI feedUri, String title, URI link, LocalDateTime publicationDate, String content) {
+        this(0, feedUri, title, link, publicationDate, content);
     }
 
     public int getId() {
         return id;
     }
 
-    public int getFeedId() {
-        return feedId;
+    public URI getFeedUri() {
+        return feedUri;
     }
 
     public String getTitle() {
@@ -44,7 +45,7 @@ public class Article {
         return content;
     }
 
-    public String getLink() {
+    public URI getLink() {
         return link;
     }
     
