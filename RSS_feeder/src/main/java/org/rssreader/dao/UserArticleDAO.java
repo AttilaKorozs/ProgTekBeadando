@@ -3,7 +3,6 @@ package org.rssreader.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,21 +59,18 @@ public class UserArticleDAO {
         String insertSql = "INSERT INTO UserArticle (user, article_id, is_read, is_favorite) VALUES (?, ?, 1, 0)";
         try (Connection conn = DatabaseConnection.getConnection()) {
 
-            // 1. Ellenőrzés: van-e ilyen rekord
             try (PreparedStatement selectStmt = conn.prepareStatement(selectSql)) {
                 selectStmt.setString(1, user.getUsername());
                 selectStmt.setInt(2, article.getId());
 
                 try (ResultSet rs = selectStmt.executeQuery()) {
                     if (rs.next()) {
-                        // 2. Ha van → frissítjük
                         try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
                             updateStmt.setString(1, user.getUsername());
                             updateStmt.setInt(2, article.getId());
                             return updateStmt.executeUpdate() > 0;
                         }
                     } else {
-                        // 3. Ha nincs → beszúrjuk
                         try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
                             insertStmt.setString(1, user.getUsername());
                             insertStmt.setInt(2, article.getId());
@@ -91,8 +87,36 @@ public class UserArticleDAO {
     }
 
     public static boolean setFavorite(User user, Article article) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setFavorite'");
+        String selectSql = "SELECT is_favorite FROM UserArticle WHERE user = ? AND article_id = ?";
+        String updateSql = "UPDATE UserArticle SET is_favorite = 1 WHERE user = ? AND article_id = ?";
+        String insertSql = "INSERT INTO UserArticle (user, article_id, is_read, is_favorite) VALUES (?, ?, 0, 1)";
+        try (Connection conn = DatabaseConnection.getConnection()) {
+
+            try (PreparedStatement selectStmt = conn.prepareStatement(selectSql)) {
+                selectStmt.setString(1, user.getUsername());
+                selectStmt.setInt(2, article.getId());
+
+                try (ResultSet rs = selectStmt.executeQuery()) {
+                    if (rs.next()) {
+                        try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+                            updateStmt.setString(1, user.getUsername());
+                            updateStmt.setInt(2, article.getId());
+                            return updateStmt.executeUpdate() > 0;
+                        }
+                    } else {
+                        try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+                            insertStmt.setString(1, user.getUsername());
+                            insertStmt.setInt(2, article.getId());
+                            return insertStmt.executeUpdate() > 0;
+                        }
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 }
