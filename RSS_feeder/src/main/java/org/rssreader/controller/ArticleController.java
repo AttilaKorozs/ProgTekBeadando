@@ -49,12 +49,13 @@ public class ArticleController {
     }
 
     private void loadArticles(Feed feed) {
-        List<Article> articles = articleService.getArticlesByFeed(feed.getId());
+        List<Article> articles = articleService.getArticlesByFeed(feed);
         articleTable.setItems(FXCollections.observableList(articles));
         txtContent.clear();
         // Opcionálisan az első cikkre is rákattintunk
         if (!articles.isEmpty()) {
             articleTable.getSelectionModel().selectFirst();
         }
+            
     }
 }

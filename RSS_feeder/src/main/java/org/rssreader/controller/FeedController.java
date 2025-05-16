@@ -15,6 +15,8 @@ import javafx.scene.layout.GridPane;
 import org.rssreader.models.Feed;
 import org.rssreader.service.FeedService;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Optional;
 
 public class FeedController {
@@ -63,7 +65,12 @@ public class FeedController {
         dialog.getDialogPane().setContent(grid);
         dialog.setResultConverter(btn -> {
             if (btn == ButtonType.OK) {
-                return new Feed(0, nameField.getText(), urlField.getText(), intervalSpinner.getValue());
+                try {
+                    return new Feed(nameField.getText(), new URI(urlField.getText()), intervalSpinner.getValue());
+                } catch (URISyntaxException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
             return null;
         });
@@ -78,7 +85,7 @@ public class FeedController {
     @FXML private void onDeleteFeed() {
         Feed selected = feedTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
-            feedService.deleteFeed(selected.getId());
+            //feedService.deleteFeed(selected.getId());
             refreshTable();
         }
     }

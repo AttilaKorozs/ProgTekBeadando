@@ -1,23 +1,33 @@
 package org.rssreader.service;
+
 import org.rssreader.models.Feed;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public class FeedService {
     private static final FeedService INSTANCE = new FeedService();
-    public static FeedService getInstance() { return INSTANCE; }
+
+    public static FeedService getInstance() {
+        return INSTANCE;
+    }
+
     private final List<Feed> feeds = new ArrayList<>();
-    private final AtomicInteger idCounter = new AtomicInteger(1);
 
     public FeedService() {
         // Kezdeti stub adatok
-        feeds.add(new Feed(idCounter.getAndIncrement(), "Example RSS", "https://example.com/rss", 30));
-        feeds.add(new Feed(idCounter.getAndIncrement(), "News Feed", "https://news.example.com/rss", 15));
-        feeds.add(new Feed(idCounter.getAndIncrement(), "Real feed", "https://news.un.org/feed/subscribe/en/news/all/rss.xml", 15));
+        try {
+            feeds.add(new Feed("Example RSS", new URI("https://example.com/rss"), 30));
+            feeds.add(new Feed("News Feed", new URI("https://news.example.com/rss"), 15));
+            feeds.add(new Feed("Real feed", new URI("https://news.un.org/feed/subscribe/en/news/all/rss.xml"), 15));
+        } catch (URISyntaxException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
     }
 
     public List<Feed> getAllFeeds() {
@@ -25,11 +35,10 @@ public class FeedService {
     }
 
     public void addFeed(Feed feed) {
-        int id = idCounter.getAndIncrement();
-        feeds.add(new Feed(id, feed.getName(), feed.getUrl(), feed.getRefreshIntervalMin()));
+        feeds.add(feed);
     }
 
-    public void deleteFeed(int id) {
-        feeds.removeIf(f -> f.getId() == id);
+    public void deleteFeed(URI uri) {
+        feeds.removeIf(f -> f.getUri() == uri);
     }
 }

@@ -12,21 +12,21 @@ public class ArticleService {
     private final FeedService feedService = new FeedService();
     private final RssParser rssParser = new RssParser();
 
-    public List<Article> getArticlesByFeed(int feedId) {
+    public List<Article> getArticlesByFeed(Feed feedToGet) {
         Feed feed = feedService.getAllFeeds().stream()
-                .filter(f -> f.getId() == feedId)
+                .filter(f -> f.getUri() == feedToGet.getUri())
                 .findFirst()
                 .orElse(null);
         if (feed == null) {
             LogUtil.getLogger(ArticleService.class)
-                    .warn("Feed not found for id: {}", feedId);
+                    .warn("Feed not found for url: {}", feedToGet.getUri());
             return Collections.emptyList();
         }
         try {
-            return rssParser.parse(feed.getUrl(), feedId);
+            return rssParser.parse(feed.getUri());
         } catch (Exception e) {
             LogUtil.getLogger(ArticleService.class)
-                    .error("Failed to parse RSS feed: {}", feed.getUrl(), e);
+                    .error("Failed to parse RSS feed: {}", feed.getUri(), e);
             return Collections.emptyList();
         }
     }
