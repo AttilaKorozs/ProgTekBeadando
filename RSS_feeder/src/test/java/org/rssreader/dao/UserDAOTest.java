@@ -20,7 +20,7 @@ public class UserDAOTest {
         User userToCheck = UserDAO.authUser(TestData.TestUser);
         assertEquals(userToCheck, TestData.TestUser);
 
-        UserDAO.deleteUser(TestData.TestUser);
+        UserDAO.removeUser(TestData.TestUser);
         assertNull(UserDAO.authUser(TestData.TestUser));
     }
 }

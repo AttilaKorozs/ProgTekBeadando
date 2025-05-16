@@ -47,7 +47,7 @@ public class UserDAO {
         }
     }
 
-    public static boolean deleteUser(User user) {
+    public static boolean removeUser(User user) {
         String sql = "DELETE FROM User WHERE username = ?";
 
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
