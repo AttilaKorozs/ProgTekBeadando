@@ -4,9 +4,12 @@ package org.rssreader.dao;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.util.List;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.rssreader.models.Article;
 
 public class ArticleDAOTest {
 
@@ -30,10 +33,10 @@ public class ArticleDAOTest {
     static void removeTestData() {
         
 
-        //List<Article> testArticles = ArticleDAO.getArticle(TestData.TestFeed);
-        //for (Article article : testArticles) {
-        //    ArticleDAO.removeArticle(article);
-        //}
+        List<Article> testArticles = ArticleDAO.getArticle(TestData.TestFeed);
+        for (Article article : testArticles) {
+            ArticleDAO.removeArticle(article);
+        }
 
         UserDAO.removeUser(TestData.TestUser);
         FeedDAO.removeFeed(TestData.TestFeed);
