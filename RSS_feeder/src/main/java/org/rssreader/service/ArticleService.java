@@ -4,16 +4,21 @@ import org.rssreader.models.Article;
 import org.rssreader.models.Feed;
 import org.rssreader.util.LogUtil;
 import org.rssreader.util.RssParser;
+import org.rssreader.service.decorator.*;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+
+
+
 
 public class ArticleService {
     //private final FeedService feedService = new FeedService();
     private final FeedService feedService = FeedService.getInstance();
     private final RssParser rssParser = new RssParser();
 
-    public List<Article> getArticlesByFeed(Feed feedToGet) {
+    public List<Article> getArticlesByFeeds(Feed feedToGet) {
         Feed feed = feedService.getAllFeeds().stream()
                 .filter(f -> f.getUri() .equals(feedToGet.getUri()))
                 .findFirst()
@@ -30,6 +35,27 @@ public class ArticleService {
                     .error("Failed to parse RSS feed: {}", feed.getUri(), e);
             return Collections.emptyList();
         }
+    }
+
+
+
+
+    public List<ArticleComponent> getArticlesByFeed(Feed feed) {
+        List<Article> articles;
+        try {
+            articles = rssParser.parse(feed.getUri());
+        } catch (Exception e) {
+            LogUtil.getLogger(ArticleService.class)
+                    .error("RSS parse error for URL: {}", feed.getUri(), e);
+            return Collections.emptyList();
+        }
+
+        // wrappelek BasicArticleComponent‐tel és dekorálok
+        return articles.stream()
+                .map(a -> new BasicArticleComponent(a))
+                .map(ac -> new FavoriteDecorator(ac))
+                .map(ac -> new ReadDecorator(ac))
+                .collect(Collectors.toList());
     }
 }
 

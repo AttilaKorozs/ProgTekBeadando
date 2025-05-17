@@ -1,11 +1,13 @@
 package org.rssreader.service.filter;
 
 import org.rssreader.models.Article;
+import org.rssreader.service.decorator.ArticleComponent;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DateFilter implements FilterStrategy {
+public class DateFilter implements FilterStrategy<ArticleComponent>  {
     private final LocalDate date;
 
     public DateFilter(LocalDate date) {
@@ -13,7 +15,7 @@ public class DateFilter implements FilterStrategy {
     }
 
     @Override
-    public List<Article> filter(List<Article> articles) {
+    public List<ArticleComponent>  filter(List<ArticleComponent>  articles) {
         if (date == null) return articles;
         return articles.stream()
                 .filter(a -> a.getPublicationDate() != null

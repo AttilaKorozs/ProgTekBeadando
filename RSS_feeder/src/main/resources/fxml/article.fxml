@@ -23,17 +23,23 @@
             <ChoiceBox fx:id="choiceFilter" prefWidth="120"/>
             <TextField fx:id="txtKeyword" promptText="Keyword" visible="false"/>
             <DatePicker fx:id="datePicker" visible="false"/>
-            <Button text="Apply" onAction="#onApplyFilter"/>
+            <Button fx:id="btnApply" text="Apply" onAction="#onApplyFilter"/>
         </HBox>
 
 
         <!-- Feed lista -->
         <ListView fx:id="feedList" layoutX="10" layoutY="60" prefWidth="150" prefHeight="350"/>
         <!-- Cikkek táblázat-->
-        <TableView fx:id="articleTable" layoutX="170" layoutY="60" prefWidth="420" prefHeight="250">
+        <TableView fx:id="articleTable" layoutX="170" layoutY="60" prefWidth="520" prefHeight="250">
             <columns>
-                <TableColumn fx:id="colTitle" text="Title" prefWidth="300"/>
-                <TableColumn fx:id="colDate"  text="Date"  prefWidth="120"/>
+                <!-- Kedvenc státusz -->
+                <TableColumn fx:id="colFavorite" text="★" prefWidth="40"/>
+                <!-- Cím -->
+                <TableColumn fx:id="colTitle"    text="Title" prefWidth="300"/>
+                <!-- Dátum -->
+                <TableColumn fx:id="colDate"     text="Date"  prefWidth="120"/>
+                <!-- Olvasott státusz -->
+                <TableColumn fx:id="colRead"     text="✓"     prefWidth="40"/>
             </columns>
         </TableView>
         <!-- Cikk tartalom-->

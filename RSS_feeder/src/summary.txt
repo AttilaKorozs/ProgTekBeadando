@@ -207,17 +207,23 @@ main\resources\fxml\article.fxml tartalma:
             <ChoiceBox fx:id="choiceFilter" prefWidth="120"/>
             <TextField fx:id="txtKeyword" promptText="Keyword" visible="false"/>
             <DatePicker fx:id="datePicker" visible="false"/>
-            <Button text="Apply" onAction="#onApplyFilter"/>
+            <Button fx:id="btnApply" text="Apply" onAction="#onApplyFilter"/>
         </HBox>
 
 
         <!-- Feed lista -->
         <ListView fx:id="feedList" layoutX="10" layoutY="60" prefWidth="150" prefHeight="350"/>
         <!-- Cikkek táblázat-->
-        <TableView fx:id="articleTable" layoutX="170" layoutY="60" prefWidth="420" prefHeight="250">
+        <TableView fx:id="articleTable" layoutX="170" layoutY="60" prefWidth="520" prefHeight="250">
             <columns>
-                <TableColumn fx:id="colTitle" text="Title" prefWidth="300"/>
-                <TableColumn fx:id="colDate"  text="Date"  prefWidth="120"/>
+                <!-- Kedvenc státusz -->
+                <TableColumn fx:id="colFavorite" text="★" prefWidth="40"/>
+                <!-- Cím -->
+                <TableColumn fx:id="colTitle"    text="Title" prefWidth="300"/>
+                <!-- Dátum -->
+                <TableColumn fx:id="colDate"     text="Date"  prefWidth="120"/>
+                <!-- Olvasott státusz -->
+                <TableColumn fx:id="colRead"     text="✓"     prefWidth="40"/>
             </columns>
         </TableView>
         <!-- Cikk tartalom-->
@@ -335,92 +341,137 @@ public class App extends Application {
 main\java\org\rssreader\controller\ArticleController.java tartalma:
 package org.rssreader.controller;
 
+import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
-import org.rssreader.models.Article;
+import javafx.scene.layout.HBox;
+import javafx.util.converter.DefaultStringConverter;
 import org.rssreader.models.Feed;
 import org.rssreader.service.ArticleService;
-import org.rssreader.service.filter.*;
 import org.rssreader.service.FeedService;
+import org.rssreader.service.decorator.ArticleComponent;
+import org.rssreader.service.filter.DateFilter;
+import org.rssreader.service.filter.FilterStrategy;
+import org.rssreader.service.filter.KeywordFilter;
+import org.rssreader.service.filter.TitleFilter;
 
+import java.awt.event.ActionEvent;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ArticleController {
+
+    // --- Szűrési UI ---
     @FXML private ChoiceBox<String> choiceFilter;
     @FXML private TextField txtKeyword;
     @FXML private DatePicker datePicker;
+    @FXML private Button btnApply;
 
+    // --- Fő tartalom ---
     @FXML private ListView<Feed> feedList;
-    @FXML private TableView<Article> articleTable;
-    @FXML private TableColumn<Article, String> colTitle;
-    @FXML private TableColumn<Article, java.time.LocalDateTime> colDate;
+    @FXML private TableView<ArticleComponent> articleTable;
+    @FXML private TableColumn<ArticleComponent, String> colTitle;
+    @FXML private TableColumn<ArticleComponent, LocalDateTime> colDate;
+    @FXML private TableColumn<ArticleComponent, Boolean> colFavorite;
+    @FXML private TableColumn<ArticleComponent, Boolean> colRead;
     @FXML private TextArea txtContent;
 
     private final FeedService feedService = FeedService.getInstance();
-    private final ArticleService articleService = new ArticleService();
-    private List<Article> originalArticles;  // tábla eredeti tartalma
+    private final ArticleService articleService = new ArticleService();  // ha ArticleService-ben parser a probléma, ott rssParser.parse(...)
+    private List<ArticleComponent> originalArticles;
+
+
+
+
+
+    @FXML
+    private void onApplyFilter() {
+        applyFilter();
+    }
 
     @FXML
     public void initialize() {
-        // ChoiceBox feltöltése
-        choiceFilter.setItems(FXCollections.observableArrayList(
-                "All", "Title", "Date", "Keyword"
-        ));
-        choiceFilter.getSelectionModel().selectFirst();
-
-        // Szűrő mezők elrejtése
+        // 1. Szűrő választó feltöltése
+        choiceFilter.setItems(FXCollections.observableArrayList("All", "Title", "Date", "Keyword"));
+        choiceFilter.getSelectionModel().select("All");
         txtKeyword.setVisible(false);
         datePicker.setVisible(false);
 
-        // ChoiceBox váltás hatása
-        choiceFilter.getSelectionModel().selectedItemProperty().addListener((obs, old, choice) -> {
-            boolean isKeyword = choice.equals("Title") || choice.equals("Keyword");
-            txtKeyword.setVisible(isKeyword);
-            datePicker.setVisible(choice.equals("Date"));
+        // 2. Váltáskor a megfelelő mező látható
+        choiceFilter.getSelectionModel().selectedItemProperty()
+                .addListener((obs, old, choice) -> {
+                    txtKeyword.setVisible("Title".equals(choice) || "Keyword".equals(choice));
+                    datePicker.setVisible("Date".equals(choice));
+                });
+
+        // 3. Gomb esemény
+        btnApply.setOnAction(e -> applyFilter());
+
+        // 4. Táblázat oszlopok
+        colTitle.setCellValueFactory(cd ->
+                new ReadOnlyObjectWrapper<>(cd.getValue().getTitle()));
+        colDate.setCellValueFactory(cd ->
+                new ReadOnlyObjectWrapper<>(cd.getValue().getPublicationDate()));
+
+        colFavorite.setCellValueFactory(cd ->
+                new ReadOnlyBooleanWrapper(cd.getValue().isFavorite()));
+        colFavorite.setCellFactory(CheckBoxTableCell.forTableColumn(colFavorite));
+        colFavorite.setEditable(true);
+
+        colRead.setCellValueFactory(cd ->
+                new ReadOnlyBooleanWrapper(cd.getValue().isRead()));
+        colRead.setCellFactory(CheckBoxTableCell.forTableColumn(colRead));
+        colRead.setEditable(true);
+
+        articleTable.setEditable(true);
+
+        // 5. Checkbox commit kezelők
+        colFavorite.setOnEditCommit(e -> {
+            ArticleComponent ac = e.getRowValue();
+            ac.setFavorite(e.getNewValue());
+            articleTable.refresh();
+        });
+        colRead.setOnEditCommit(e -> {
+            ArticleComponent ac = e.getRowValue();
+            ac.setRead(e.getNewValue());
+            articleTable.refresh();
         });
 
-        // Táblázat oszlopok beállítása
-        colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
-        colDate.setCellValueFactory(new PropertyValueFactory<>("publicationDate"));
-
-        // Feed lista feltöltése és kiválasztási listener
+        // 6. Feed lista és kiválasztás
         feedList.setItems(FXCollections.observableList(feedService.getAllFeeds()));
         feedList.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldF, newF) -> {
                     if (newF != null) loadArticles(newF);
                 });
 
-        // Alapértelmezett feed kiválasztása
+        // 7. Alapértelmezett feed kiválasztása
         if (!feedList.getItems().isEmpty()) {
             feedList.getSelectionModel().selectFirst();
         }
 
-        // Sor kiválasztása → tartalom megjelenítés
+        // 8. Cikk kiválasztás → content megjelenítés
         articleTable.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldA, newA) -> {
                     txtContent.setText(newA != null ? newA.getContent() : "");
                 });
     }
 
-    /** Betölti a cikkeket és elmenti a teljes listát. */
+    /** Betölti a cikkeket a kiválasztott Feed alapján. */
     private void loadArticles(Feed feed) {
         originalArticles = articleService.getArticlesByFeed(feed);
         applyFilter();
     }
 
-    /** Szűrés lefuttatása a kiválasztott stratégia szerint. */
-    @FXML
-    private void onApplyFilter() {
-        applyFilter();
-    }
-
+    /** Alkalmazza a kiválasztott FilterStrategy-t az eredeti listára. */
     private void applyFilter() {
         String choice = choiceFilter.getValue();
         FilterStrategy strategy;
-
         switch (choice) {
             case "Title":
                 strategy = new TitleFilter(txtKeyword.getText());
@@ -429,14 +480,12 @@ public class ArticleController {
                 strategy = new KeywordFilter(txtKeyword.getText());
                 break;
             case "Date":
-                LocalDate d = datePicker.getValue();
-                strategy = new DateFilter(d);
+                strategy = new DateFilter(datePicker.getValue());
                 break;
-            default:  // "All"
+            default: // "All"
                 strategy = articles -> articles;
         }
-
-        List<Article> filtered = strategy.filter(originalArticles);
+        List<ArticleComponent> filtered = strategy.filter(originalArticles);
         articleTable.setItems(FXCollections.observableList(filtered));
         if (!filtered.isEmpty()) {
             articleTable.getSelectionModel().selectFirst();
@@ -1328,16 +1377,21 @@ import org.rssreader.models.Article;
 import org.rssreader.models.Feed;
 import org.rssreader.util.LogUtil;
 import org.rssreader.util.RssParser;
+import org.rssreader.service.decorator.*;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+
+
+
 
 public class ArticleService {
     //private final FeedService feedService = new FeedService();
     private final FeedService feedService = FeedService.getInstance();
     private final RssParser rssParser = new RssParser();
 
-    public List<Article> getArticlesByFeed(Feed feedToGet) {
+    public List<Article> getArticlesByFeeds(Feed feedToGet) {
         Feed feed = feedService.getAllFeeds().stream()
                 .filter(f -> f.getUri() .equals(feedToGet.getUri()))
                 .findFirst()
@@ -1354,6 +1408,27 @@ public class ArticleService {
                     .error("Failed to parse RSS feed: {}", feed.getUri(), e);
             return Collections.emptyList();
         }
+    }
+
+
+
+
+    public List<ArticleComponent> getArticlesByFeed(Feed feed) {
+        List<Article> articles;
+        try {
+            articles = rssParser.parse(feed.getUri());
+        } catch (Exception e) {
+            LogUtil.getLogger(ArticleService.class)
+                    .error("RSS parse error for URL: {}", feed.getUri(), e);
+            return Collections.emptyList();
+        }
+
+        // wrappelek BasicArticleComponent‐tel és dekorálok
+        return articles.stream()
+                .map(a -> new BasicArticleComponent(a))
+                .map(ac -> new FavoriteDecorator(ac))
+                .map(ac -> new ReadDecorator(ac))
+                .collect(Collectors.toList());
     }
 }
 
@@ -1411,6 +1486,14 @@ public class FeedService {
 
     public void deleteFeed(URI uri) {
         feeds.removeIf(f -> f.getUri() == uri);
+    }
+
+    /** URI alapján visszaadja a pontos Feed példányt */
+    public Feed getFeedByUri(URI uri) {
+        return getAllFeeds().stream()
+                .filter(f -> f.getUri().equals(uri))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Unknown feed URI: "+uri));
     }
 }
 
@@ -1557,15 +1640,179 @@ public class Session {
 }
 
 
+main\java\org\rssreader\service\decorator\ArticleComponent.java tartalma:
+package org.rssreader.service.decorator;
+
+import org.rssreader.models.Article;
+
+import java.net.URI;
+import java.time.LocalDateTime;
+
+public interface ArticleComponent {
+    String getTitle();
+    URI getLink();
+    LocalDateTime getPublicationDate();
+    String getContent();
+
+    boolean isFavorite();
+    boolean isRead();
+
+    /** Beállítja a kedvenc-státuszt (DAO hívás itt történik) */
+    void setFavorite(boolean fav);
+
+    /** Beállítja az olvasott-státuszt (DAO hívás itt történik) */
+    void setRead(boolean read);
+
+    Article getModel();
+}
+
+
+main\java\org\rssreader\service\decorator\ArticleDecorator.java tartalma:
+package org.rssreader.service.decorator;
+
+import org.rssreader.models.Article;
+
+import java.net.URI;
+import java.time.LocalDateTime;
+
+public abstract class ArticleDecorator implements ArticleComponent {
+    protected final ArticleComponent wrappee;
+
+    protected ArticleDecorator(ArticleComponent wrappee) {
+        this.wrappee = wrappee;
+    }
+
+    @Override public String getTitle()               { return wrappee.getTitle(); }
+    @Override public URI getLink()                   { return wrappee.getLink(); }
+    @Override public LocalDateTime getPublicationDate() { return wrappee.getPublicationDate(); }
+    @Override public String getContent()             { return wrappee.getContent(); }
+    @Override public Article getModel()               { return wrappee.getModel(); }
+
+    // Ezekre **nem** kell felülírni semmit, mert az alap wrappee-je
+    // (BasicArticleComponent) hamisra állítja őket, ha soha nem hívtad meg:
+    @Override public boolean isFavorite()             { return wrappee.isFavorite(); }
+    @Override public void setFavorite(boolean fav)    { wrappee.setFavorite(fav); }
+    @Override public boolean isRead()                 { return wrappee.isRead(); }
+    @Override public void setRead(boolean read)       { wrappee.setRead(read); }
+}
+
+
+main\java\org\rssreader\service\decorator\BasicArticleComponent.java tartalma:
+package org.rssreader.service.decorator;
+
+import org.rssreader.models.Article;
+import java.net.URI;
+import java.time.LocalDateTime;
+
+public class BasicArticleComponent implements ArticleComponent {
+    private final Article article;
+
+    public BasicArticleComponent(Article article) {
+        this.article = article;
+    }
+
+    @Override public String getTitle()               { return article.getTitle(); }
+    @Override public URI getLink()                   { return article.getLink(); }
+    @Override public LocalDateTime getPublicationDate() { return article.getPublicationDate(); }
+    @Override public String getContent()             { return article.getContent(); }
+
+    /** alapból nincs státusz, dekorátorokban lesz felülírva */
+    @Override public boolean isFavorite()            { return false; }
+    @Override public boolean isRead()                { return false; }
+
+    @Override public void setFavorite(boolean fav)   { /* noop */ }
+    @Override public void setRead(boolean read)      { /* noop */ }
+
+    @Override public Article getModel()              { return article; }
+}
+
+
+main\java\org\rssreader\service\decorator\FavoriteDecorator.java tartalma:
+package org.rssreader.service.decorator;
+
+import org.rssreader.dao.UserArticleDAO;
+import org.rssreader.models.Article;
+import org.rssreader.models.Feed;
+import org.rssreader.service.FeedService;
+import org.rssreader.util.Session;
+
+/**
+ * Megjeleníti és kezeli a kedvenc-státuszt.
+ */
+public class FavoriteDecorator extends ArticleDecorator {
+    private final FeedService feedService = FeedService.getInstance();
+
+    public FavoriteDecorator(ArticleComponent wrappee) {
+        super(wrappee);
+    }
+
+    @Override
+    public boolean isFavorite() {
+        Article a = wrappee.getModel();
+        Feed feed = feedService.getFeedByUri(a.getFeedUri());
+        return UserArticleDAO.getUserArticle(Session.getCurrentUser(), feed)
+                .stream().anyMatch(ua -> ua.getArticle().getId()==a.getId() && ua.isFavorite());
+    }
+
+    @Override
+    public void setFavorite(boolean fav) {
+        Article a = wrappee.getModel();
+        Feed feed = feedService.getFeedByUri(a.getFeedUri());
+        if (fav) {
+            UserArticleDAO.setFavorite(Session.getCurrentUser(), a);
+        } else {
+            // implementáld a törlést is, ha kell
+        }
+    }
+}
+
+
+main\java\org\rssreader\service\decorator\ReadDecorator.java tartalma:
+package org.rssreader.service.decorator;
+
+import org.rssreader.dao.UserArticleDAO;
+import org.rssreader.models.Article;
+import org.rssreader.models.Feed;
+import org.rssreader.service.FeedService;
+import org.rssreader.util.Session;
+
+public class ReadDecorator extends ArticleDecorator {
+    private final FeedService feedService = FeedService.getInstance();
+
+    public ReadDecorator(ArticleComponent wrappee) {
+        super(wrappee);
+    }
+
+    @Override
+    public boolean isRead() {
+        Article a = wrappee.getModel();
+        Feed feed = feedService.getFeedByUri(a.getFeedUri());
+        return UserArticleDAO.getUserArticle(Session.getCurrentUser(), feed)
+                .stream().anyMatch(ua -> ua.getArticle().getId()==a.getId() && ua.isRead());
+    }
+
+    @Override
+    public void setRead(boolean read) {
+        Article a = wrappee.getModel();
+        if (read) {
+            UserArticleDAO.setRead(Session.getCurrentUser(), a);
+        } else {
+            // implementáld az olvasott jelölés törlését is, ha szükséges
+        }
+    }
+}
+
 main\java\org\rssreader\service\filter\DateFilter.java tartalma:
 package org.rssreader.service.filter;
 
 import org.rssreader.models.Article;
+import org.rssreader.service.decorator.ArticleComponent;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DateFilter implements FilterStrategy {
+public class DateFilter implements FilterStrategy<ArticleComponent>  {
     private final LocalDate date;
 
     public DateFilter(LocalDate date) {
@@ -1573,7 +1820,7 @@ public class DateFilter implements FilterStrategy {
     }
 
     @Override
-    public List<Article> filter(List<Article> articles) {
+    public List<ArticleComponent>  filter(List<ArticleComponent>  articles) {
         if (date == null) return articles;
         return articles.stream()
                 .filter(a -> a.getPublicationDate() != null
@@ -1589,11 +1836,15 @@ package org.rssreader.service.filter;
 import org.rssreader.models.Article;
 import java.util.List;
 
-public interface FilterStrategy {
+public interface FilterStrategy<T>{
     /**
      * Visszaadja a bemeneti lista azon elemeit, amelyek megfelelnek a stratégiának.
      */
-    List<Article> filter(List<Article> articles);
+   // List<Article> filter(List<Article> articles);
+
+
+        List<T> filter(List<T> items);
+
 }
 
 
@@ -1601,10 +1852,12 @@ main\java\org\rssreader\service\filter\KeywordFilter.java tartalma:
 package org.rssreader.service.filter;
 
 import org.rssreader.models.Article;
+import org.rssreader.service.decorator.ArticleComponent;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class KeywordFilter implements FilterStrategy {
+public class KeywordFilter implements FilterStrategy<ArticleComponent> {
     private final String keyword;
 
     public KeywordFilter(String keyword) {
@@ -1612,7 +1865,7 @@ public class KeywordFilter implements FilterStrategy {
     }
 
     @Override
-    public List<Article> filter(List<Article> articles) {
+    public List<ArticleComponent>  filter(List<ArticleComponent>  articles) {
         if (keyword.isBlank()) return articles;
         return articles.stream()
                 .filter(a -> a.getContent() != null
@@ -1626,10 +1879,12 @@ main\java\org\rssreader\service\filter\TitleFilter.java tartalma:
 package org.rssreader.service.filter;
 
 import org.rssreader.models.Article;
+import org.rssreader.service.decorator.ArticleComponent;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TitleFilter implements FilterStrategy {
+public class TitleFilter implements FilterStrategy<ArticleComponent>  {
     private final String keyword;
 
     public TitleFilter(String keyword) {
@@ -1637,7 +1892,7 @@ public class TitleFilter implements FilterStrategy {
     }
 
     @Override
-    public List<Article> filter(List<Article> articles) {
+    public List<ArticleComponent> filter(List<ArticleComponent> articles) {
         if (keyword.isBlank()) return articles;
         return articles.stream()
                 .filter(a -> a.getTitle().toLowerCase().contains(keyword))

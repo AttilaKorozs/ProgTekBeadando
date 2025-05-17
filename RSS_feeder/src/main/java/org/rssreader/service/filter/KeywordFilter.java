@@ -1,10 +1,12 @@
 package org.rssreader.service.filter;
 
 import org.rssreader.models.Article;
+import org.rssreader.service.decorator.ArticleComponent;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class KeywordFilter implements FilterStrategy {
+public class KeywordFilter implements FilterStrategy<ArticleComponent> {
     private final String keyword;
 
     public KeywordFilter(String keyword) {
@@ -12,7 +14,7 @@ public class KeywordFilter implements FilterStrategy {
     }
 
     @Override
-    public List<Article> filter(List<Article> articles) {
+    public List<ArticleComponent>  filter(List<ArticleComponent>  articles) {
         if (keyword.isBlank()) return articles;
         return articles.stream()
                 .filter(a -> a.getContent() != null
