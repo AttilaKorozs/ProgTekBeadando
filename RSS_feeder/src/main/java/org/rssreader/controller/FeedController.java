@@ -30,7 +30,7 @@ public class FeedController {
     private final FeedService feedService = FeedService.getInstance();
 
     @FXML public void initialize() {
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        //colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colUrl.setCellValueFactory(new PropertyValueFactory<>("url"));
         colInterval.setCellValueFactory(new PropertyValueFactory<>("refreshIntervalMin"));

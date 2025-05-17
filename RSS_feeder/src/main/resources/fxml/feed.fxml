@@ -17,7 +17,7 @@
     <center>
         <TableView fx:id="feedTable">
             <columns>
-                <TableColumn text="ID" fx:id="colId" />
+
                 <TableColumn text="Név" fx:id="colName" />
                 <TableColumn text="URL" fx:id="colUrl" />
                 <TableColumn text="Frissítés (perc)" fx:id="colInterval" />

@@ -21,6 +21,11 @@ public class Feed {
         return uri;
     }
 
+
+    public String getUrl() {
+        return uri.toString();
+    }
+
     public int getRefreshIntervalMin() {
         return refreshIntervalMin;
     }

@@ -1,0 +1,1358 @@
+test\java\org\rssreader\dao\ArticleDAOTest.java tartalma:
+package org.rssreader.dao;
+
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import java.util.List;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.rssreader.models.Article;
+
+public class ArticleDAOTest {
+
+    @BeforeAll
+    static void AddTestUser() {
+        UserDAO.addUser(TestData.TestUser);
+        FeedDAO.addFeed(TestData.TestFeed);
+    }
+
+    @Test
+    void testStoreArticle() {
+        assertEquals(ArticleDAO.getArticle(TestData.TestFeed).size(), 0);
+        ArticleDAO.storeArticle(TestData.TestArticle);
+        assertEquals(ArticleDAO.getArticle(TestData.TestFeed).size(), 1);
+        ArticleDAO.removeArticle(TestData.TestArticle);
+        assertEquals(ArticleDAO.getArticle(TestData.TestFeed).size(), 0);
+
+    }
+
+    @AfterAll
+    static void removeTestData() {
+        
+
+        List<Article> testArticles = ArticleDAO.getArticle(TestData.TestFeed);
+        for (Article article : testArticles) {
+            ArticleDAO.removeArticle(article);
+        }
+
+        UserDAO.removeUser(TestData.TestUser);
+        FeedDAO.removeFeed(TestData.TestFeed);
+    }
+}
+
+
+test\java\org\rssreader\dao\FeedDAOTest.java tartalma:
+package org.rssreader.dao;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
+
+public class FeedDAOTest {
+
+    @Test
+    void testAddFeed() {
+        assertEquals(FeedDAO.getFeedList().size(), 0);
+        FeedDAO.addFeed(TestData.TestFeed);
+        assertEquals(FeedDAO.getFeedList().size(), 1);
+    }
+
+    @Test
+    void testRemoveFeed() {
+        assertEquals(FeedDAO.getFeedList().size(), 1);
+        FeedDAO.removeFeed(TestData.TestFeed);
+        assertEquals(FeedDAO.getFeedList().size(), 0);
+    }
+}
+
+
+test\java\org\rssreader\dao\TestData.java tartalma:
+package org.rssreader.dao;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.LocalDateTime;
+
+import org.rssreader.models.*;
+
+public class TestData {
+    static User TestUser = new User("teszt", "tesztpass", "teszt@teszt.hu");
+
+    static Feed TestFeed = new Feed("FeedName", safeUri("http://www.feed.hu"), 20);
+    static final Article TestArticle = new Article(TestFeed.getUri(), "Hatalmas Teszt Link", safeUri("http://teszt.link"),
+            LocalDateTime.now(), "Szuper Content");
+
+    private static URI safeUri(String uriStr) {
+        try {
+            return new URI(uriStr);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Hibás URI: " + uriStr, e);
+        }
+    }
+}
+
+
+test\java\org\rssreader\dao\UserArticleDAOTest.java tartalma:
+package org.rssreader.dao;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.rssreader.models.UserArticle;
+
+public class UserArticleDAOTest {
+    List<UserArticle> articles;
+
+    @BeforeAll
+    static void addTestData() {
+        UserDAO.addUser(TestData.TestUser);
+        FeedDAO.addFeed(TestData.TestFeed);
+        ArticleDAO.storeArticle(TestData.TestArticle);
+    }
+
+    @Test
+    void testGetUserArticle() {
+        articles = UserArticleDAO.getUserArticle(TestData.TestUser, TestData.TestFeed);
+        assertFalse(articles.get(0).isFavorite());
+        assertFalse(articles.get(0).isRead());
+        assertEquals(articles.size(), 1);
+
+        articles.get(0).setRead();
+        assertTrue(articles.get(0).isRead());
+
+        articles.get(0).setFavorite();
+        assertTrue(articles.get(0).isFavorite());
+    }
+
+    @AfterAll
+    static void removeTestData() {
+        ArticleDAO.removeArticle(TestData.TestArticle);
+        UserDAO.removeUser(TestData.TestUser);
+        FeedDAO.removeFeed(TestData.TestFeed);
+    }
+}
+
+
+test\java\org\rssreader\dao\UserDAOTest.java tartalma:
+package org.rssreader.dao;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import org.junit.jupiter.api.Test;
+import org.rssreader.models.User;
+
+public class UserDAOTest {
+
+    
+    @Test
+    void TestUserDAO(){
+        assertNull(UserDAO.authUser(TestData.TestUser));
+        UserDAO.addUser(TestData.TestUser);
+        assertNotNull(UserDAO.authUser(TestData.TestUser));
+        TestData.TestUser=new User("teszt", "masikpass", "masik@teszt.hu");
+
+        UserDAO.modifyUser(TestData.TestUser);
+        User userToCheck = UserDAO.authUser(TestData.TestUser);
+        assertEquals(userToCheck, TestData.TestUser);
+
+        UserDAO.removeUser(TestData.TestUser);
+        assertNull(UserDAO.authUser(TestData.TestUser));
+    }
+}
+
+
+
+main\resources\dbConfig.properties tartalma:
+db.url=jdbc:mariadb://db.atix.hu:3306/EKKE_ProgTekBejadando
+db.username=ProgTek
+db.password=8o8EHIFeCi56Pe3ip2m5xoBeWI3ubO
+
+main\resources\fxml\article.fxml tartalma:
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/20"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.rssreader.controller.ArticleController">
+    <children>
+        <!-- Feed lista -->
+        <ListView fx:id="feedList"
+                  layoutX="10" layoutY="10"
+                  prefWidth="150" prefHeight="380" />
+
+        <!-- Cikkek táblázat-->
+        <TableView fx:id="articleTable"
+                   layoutX="170" layoutY="10"
+                   prefWidth="420" prefHeight="250">
+            <columns>
+                <TableColumn fx:id="colTitle" text="Title" prefWidth="300"/>
+                <TableColumn fx:id="colDate"  text="Date"  prefWidth="120"/>
+            </columns>
+        </TableView>
+
+        <!-- Cikk tartalom-->
+        <TextArea fx:id="txtContent"
+                  layoutX="170" layoutY="270"
+                  prefWidth="420" prefHeight="120"
+                  wrapText="true" />
+    </children>
+</AnchorPane>
+
+main\resources\fxml\feed.fxml tartalma:
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<BorderPane xmlns="http://javafx.com/javafx/20" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.rssreader.controller.FeedController">
+    <top>
+        <ToolBar>
+            <Button text="Új feed" onAction="#onAddFeed" />
+            <Button text="Törlés" onAction="#onDeleteFeed" />
+        </ToolBar>
+    </top>
+    <center>
+        <TableView fx:id="feedTable">
+            <columns>
+                <TableColumn text="ID" fx:id="colId" />
+                <TableColumn text="Név" fx:id="colName" />
+                <TableColumn text="URL" fx:id="colUrl" />
+                <TableColumn text="Frissítés (perc)" fx:id="colInterval" />
+            </columns>
+        </TableView>
+    </center>
+</BorderPane>
+
+
+main\resources\fxml\main.fxml tartalma:
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.StackPane?>
+<BorderPane xmlns="http://javafx.com/javafx/20" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.rssreader.controller.MainController">
+    <left>
+        <VBox spacing="10" alignment="CENTER">
+            <Button text="Feedek" onAction="#onShowFeeds" />
+            <Button text="Cikkek" onAction="#onShowArticles" />
+        </VBox>
+    </left>
+    <center>
+        <StackPane fx:id="contentPane" />
+    </center>
+</BorderPane>
+
+main\java\org\rssreader\App.java tartalma:
+package org.rssreader;
+
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
+public class App extends Application {
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
+        Scene scene = new Scene(loader.load());
+        primaryStage.setTitle("RSS Feeder");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
+
+main\java\org\rssreader\controller\ArticleController.java tartalma:
+package org.rssreader.controller;
+
+import javafx.collections.FXCollections;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import org.rssreader.models.Article;
+import org.rssreader.models.Feed;
+import org.rssreader.service.ArticleService;
+import org.rssreader.service.FeedService;
+
+import java.util.List;
+
+public class ArticleController {
+    @FXML private ListView<Feed> feedList;
+    @FXML private TableView<Article> articleTable;
+    @FXML private TableColumn<Article, String> colTitle;
+    @FXML private TableColumn<Article, java.time.LocalDateTime> colDate;
+    @FXML private TextArea txtContent;
+
+    private final FeedService feedService = FeedService.getInstance();
+    private final ArticleService articleService = new ArticleService();
+
+    @FXML
+    public void initialize() {
+        // 1. Feed lista feltöltése
+        feedList.setItems(FXCollections.observableList(feedService.getAllFeeds()));
+
+        // 2. Táblázat konfigurálása
+        colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
+        colDate .setCellValueFactory(new PropertyValueFactory<>("publicationDate"));
+
+        // 3. Lista kiválasztás‐változás listener
+        feedList.getSelectionModel().selectedItemProperty()
+                .addListener((obs, oldF, newF) -> {
+                    if (newF != null) loadArticles(newF);
+                });
+
+        // 4. Tábla sor kiválasztás‐változás listener
+        articleTable.getSelectionModel().selectedItemProperty()
+                .addListener((obs, oldA, newA) -> {
+                    if (newA != null) txtContent.setText(newA.getContent());
+                });
+
+        // 5. Alapértelmezett első feed kiválasztása
+        if (!feedList.getItems().isEmpty()) {
+            feedList.getSelectionModel().selectFirst();
+        }
+    }
+
+    private void loadArticles(Feed feed) {
+        List<Article> articles = articleService.getArticlesByFeed(feed);
+        articleTable.setItems(FXCollections.observableList(articles));
+        txtContent.clear();
+        // Opcionálisan az első cikkre is rákattintunk
+        if (!articles.isEmpty()) {
+            articleTable.getSelectionModel().selectFirst();
+        }
+            
+    }
+}
+
+
+main\java\org\rssreader\controller\FeedController.java tartalma:
+package org.rssreader.controller;
+
+import javafx.collections.FXCollections;
+import javafx.fxml.FXML;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
+import org.rssreader.models.Feed;
+import org.rssreader.service.FeedService;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Optional;
+
+public class FeedController {
+    @FXML private TableView<Feed> feedTable;
+    @FXML private TableColumn<Feed, Integer> colId;
+    @FXML private TableColumn<Feed, String> colName;
+    @FXML private TableColumn<Feed, String> colUrl;
+    @FXML private TableColumn<Feed, Integer> colInterval;
+
+    //private final FeedService feedService = new FeedService();
+    private final FeedService feedService = FeedService.getInstance();
+
+    @FXML public void initialize() {
+        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colUrl.setCellValueFactory(new PropertyValueFactory<>("url"));
+        colInterval.setCellValueFactory(new PropertyValueFactory<>("refreshIntervalMin"));
+        refreshTable();
+    }
+
+    private void refreshTable() {
+        feedTable.setItems(FXCollections.observableList(feedService.getAllFeeds()));
+    }
+
+    @FXML private void onAddFeed() {
+        Dialog<Feed> dialog = new Dialog<>();
+        dialog.setTitle("Új feed hozzáadása");
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+
+        TextField nameField = new TextField();
+        TextField urlField = new TextField();
+        Spinner<Integer> intervalSpinner = new Spinner<>();
+        intervalSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 1440, 30));
+
+        grid.add(new Label("Név:"), 0, 0);
+        grid.add(nameField, 1, 0);
+        grid.add(new Label("URL:"), 0, 1);
+        grid.add(urlField, 1, 1);
+        grid.add(new Label("Frissítési intervallum (perc):"), 0, 2);
+        grid.add(intervalSpinner, 1, 2);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.setResultConverter(btn -> {
+            if (btn == ButtonType.OK) {
+                try {
+                    return new Feed(nameField.getText(), new URI(urlField.getText()), intervalSpinner.getValue());
+                } catch (URISyntaxException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        });
+
+        Optional<Feed> result = dialog.showAndWait();
+        result.ifPresent(feed -> {
+            feedService.addFeed(feed);
+            refreshTable();
+        });
+    }
+
+    @FXML private void onDeleteFeed() {
+        Feed selected = feedTable.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            //feedService.deleteFeed(selected.getId());
+            refreshTable();
+        }
+    }
+}
+
+main\java\org\rssreader\controller\MainController.java tartalma:
+package org.rssreader.controller;
+
+
+
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.layout.StackPane;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+public class MainController {
+    private static final Logger logger = LogManager.getLogger(MainController.class);
+
+    @FXML private StackPane contentPane;
+
+    @FXML public void initialize() {
+        // Alapnézetként betölthetjük a feedek listáját
+        onShowFeeds();
+    }
+
+    @FXML private void onShowFeeds() {
+        loadView("/fxml/feed.fxml");
+    }
+
+    @FXML private void onShowArticles() {
+        loadView("/fxml/article.fxml");
+    }
+
+    private void loadView(String fxmlPath) {
+        try {
+            Node view = FXMLLoader.load(getClass().getResource(fxmlPath));
+            contentPane.getChildren().setAll(view);
+        } catch (Exception e) {
+            logger.error("Nem sikerült betölteni a nézetet: {}", fxmlPath, e);
+        }
+    }
+}
+
+main\java\org\rssreader\dao\ArticleDAO.java tartalma:
+package org.rssreader.dao;
+
+import java.net.URI;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.rssreader.models.Article;
+import org.rssreader.models.Feed;
+
+public class ArticleDAO {
+
+    public static void storeArticle(Article article) {
+        String sql = "INSERT INTO Article (feed_url, title, link, publication_date, content) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            stmt.setString(1, article.getFeedUri().toString());
+            stmt.setString(2, article.getTitle());
+            stmt.setString(3, article.getLink().toString());
+            stmt.setTimestamp(4, Timestamp.valueOf(article.getPublicationDate()));
+            stmt.setString(5, article.getContent());
+
+            int affectedRows = stmt.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new SQLException("A beszúrás nem járt sikerrel, nem hozott létre sort.");
+            }
+
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    article.setId(generatedKeys.getInt(1));
+                } else {
+                    throw new SQLException("Nem sikerült lekérni a generált kulcsot.");
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static List<Article> getArticle(Feed feed) {
+        String sql = "SELECT * FROM Article WHERE feed_url = ?";
+        List<Article> articles = new ArrayList<>();
+
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, feed.getUri().toString());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Article article = new Article(rs.getInt("id"),
+                            new URI(rs.getString("feed_url")),
+                            rs.getString("title"),
+                            new URI(rs.getString("link")),
+                            rs.getTimestamp("publication_date").toLocalDateTime(),
+                            rs.getString("content"));
+                    articles.add(article);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return articles;
+    }
+
+    public static void removeArticle(Article article) {
+        String sql = "DELETE FROM Article WHERE id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, article.getId());
+
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                System.out.println("Nem található cikk ezzel az ID-val: " + article.getId());
+            } else {
+                System.out.println("Cikk sikeresen törölve. ID: " + article.getId());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+
+
+main\java\org\rssreader\dao\DatabaseConnection.java tartalma:
+package org.rssreader.dao;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Properties;
+
+import org.rssreader.App;
+
+public class DatabaseConnection {
+
+    private static Connection connection;
+
+    public static Connection getConnection() throws SQLException, FileNotFoundException {
+        if (connection == null || connection.isClosed()) {
+            Properties props = new Properties();
+            try (InputStream input = App.class.getClassLoader().getResourceAsStream("dbConfig.properties")) {
+                if (input == null) {
+                    throw new IOException();
+                }
+                props.load(input);
+            } catch (IOException e) {
+                throw new FileNotFoundException("DB Connection Settings file not found.");
+            }
+            connection = DriverManager.getConnection(props.getProperty("db.url"), props.getProperty("db.username"), props.getProperty("db.password"));
+        }
+        return connection;
+    }
+
+}
+
+
+main\java\org\rssreader\dao\FeedDAO.java tartalma:
+package org.rssreader.dao;
+
+import java.net.URI;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import org.rssreader.models.Feed;
+
+public class FeedDAO {
+
+    public static void addFeed(Feed feed) {
+        String sql = "INSERT INTO Feed (name, url, refresh_interval_min) VALUES (?, ?, ?)";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, feed.getName());
+            stmt.setString(2, feed.getUri().toString());
+            stmt.setInt(3, feed.getRefreshIntervalMin());
+
+            stmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static List<Feed> getFeedList() {
+        String sql = "SELECT * FROM Feed";
+        List<Feed> feeds = new ArrayList<>();
+
+        try (Connection conn = DatabaseConnection.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                Feed feed = new Feed(
+                        rs.getString("name"),
+                        new URI(rs.getString("url")),
+                        rs.getInt("refresh_interval_min"));
+                feeds.add(feed);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null; // vagy üres lista: return Collections.emptyList();
+        }
+
+        return feeds;
+    }
+
+    public static boolean removeFeed(Feed feed) {
+        String sql = "DELETE FROM Feed WHERE url = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, feed.getUri().toString());
+
+            int affectedRows = stmt.executeUpdate();
+            return affectedRows > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+    }
+
+}
+
+
+main\java\org\rssreader\dao\UserArticleDAO.java tartalma:
+package org.rssreader.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.rssreader.models.Article;
+import org.rssreader.models.Feed;
+import org.rssreader.models.User;
+import org.rssreader.models.UserArticle;
+
+public class UserArticleDAO {
+    public static List<UserArticle> getUserArticle(User user, Feed feed) {
+        List<Article> articles = ArticleDAO.getArticle(feed);
+        List<UserArticle> userArticles = new ArrayList<UserArticle>();
+        for (Article article : articles) {
+            ResultSet rs = getUserData(user, article);
+            try {
+                userArticles.add(new UserArticle(user,
+                        article,
+                        rs.getBoolean("is_favorite"),
+                        rs.getBoolean("is_read"),
+                        (rs.getTimestamp("updated_at") == null)
+                                ? LocalDateTime.now()
+                                : rs.getTimestamp("updated_at").toLocalDateTime()));
+            } catch (Exception e) {
+                userArticles.add(new UserArticle(user,
+                        article,
+                        false,
+                        false,
+                        LocalDateTime.now()));
+            }
+        }
+        return userArticles;
+    }
+
+    private static ResultSet getUserData(User user, Article article) {
+        String sql = "SELECT is_favourite, is_read, updated_at, FROM UserArticle WHERE user = ? AND article_id = ?";
+        ResultSet rs;
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, user.getUsername());
+            stmt.setInt(1, article.getId());
+            rs = stmt.executeQuery();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return rs;
+    }
+
+    public static boolean setRead(User user, Article article) {
+        String selectSql = "SELECT 1 FROM UserArticle WHERE user = ? AND article_id = ?";
+        String updateSql = "UPDATE UserArticle SET is_read = 1 WHERE user = ? AND article_id = ?";
+        String insertSql = "INSERT INTO UserArticle (user, article_id, is_read, is_favorite) VALUES (?, ?, 1, 0)";
+        try (Connection conn = DatabaseConnection.getConnection()) {
+
+            try (PreparedStatement selectStmt = conn.prepareStatement(selectSql)) {
+                selectStmt.setString(1, user.getUsername());
+                selectStmt.setInt(2, article.getId());
+
+                try (ResultSet rs = selectStmt.executeQuery()) {
+                    if (rs.next()) {
+                        try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+                            updateStmt.setString(1, user.getUsername());
+                            updateStmt.setInt(2, article.getId());
+                            return updateStmt.executeUpdate() > 0;
+                        }
+                    } else {
+                        try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+                            insertStmt.setString(1, user.getUsername());
+                            insertStmt.setInt(2, article.getId());
+                            return insertStmt.executeUpdate() > 0;
+                        }
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean setFavorite(User user, Article article) {
+        String selectSql = "SELECT is_favorite FROM UserArticle WHERE user = ? AND article_id = ?";
+        String updateSql = "UPDATE UserArticle SET is_favorite = 1 WHERE user = ? AND article_id = ?";
+        String insertSql = "INSERT INTO UserArticle (user, article_id, is_read, is_favorite) VALUES (?, ?, 0, 1)";
+        try (Connection conn = DatabaseConnection.getConnection()) {
+
+            try (PreparedStatement selectStmt = conn.prepareStatement(selectSql)) {
+                selectStmt.setString(1, user.getUsername());
+                selectStmt.setInt(2, article.getId());
+
+                try (ResultSet rs = selectStmt.executeQuery()) {
+                    if (rs.next()) {
+                        try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+                            updateStmt.setString(1, user.getUsername());
+                            updateStmt.setInt(2, article.getId());
+                            return updateStmt.executeUpdate() > 0;
+                        }
+                    } else {
+                        try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+                            insertStmt.setString(1, user.getUsername());
+                            insertStmt.setInt(2, article.getId());
+                            return insertStmt.executeUpdate() > 0;
+                        }
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+}
+
+
+main\java\org\rssreader\dao\UserDAO.java tartalma:
+package org.rssreader.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import org.mindrot.jbcrypt.BCrypt;
+import org.rssreader.models.User;
+
+public class UserDAO {
+
+    public static void addUser(User user) {
+        String sql = "INSERT INTO User (username, password_hash, email) VALUES (?, ?, ?)";
+        String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, user.getUsername());
+            stmt.setString(2, hashedPassword);
+            stmt.setString(3, user.getEmail());
+
+            stmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static User authUser(User user) {
+        String sql = "SELECT password_hash, email FROM User WHERE username = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, user.getUsername());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String storedHash = rs.getString("password_hash");
+                    if (BCrypt.checkpw(user.getPassword(), storedHash)) {
+                        User authedUser = new User(user.getUsername(), user.getPassword(), rs.getString("email"));
+                        return authedUser;
+                    }
+                }
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static boolean removeUser(User user) {
+        String sql = "DELETE FROM User WHERE username = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, user.getUsername());
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean modifyUser(User user) {
+        String sql = "UPDATE User SET password_hash = ?, email = ? WHERE username = ?";
+        String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, hashedPassword);
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, user.getUsername());
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+    }
+}
+
+
+main\java\org\rssreader\models\Article.java tartalma:
+package org.rssreader.models;
+
+import java.net.URI;
+import java.time.LocalDateTime;
+
+public class Article {
+    private int id;
+    private final URI feedUri;
+    private final String title;
+    private final URI link;
+    private final LocalDateTime publicationDate;
+    private final String content;
+
+
+    public Article(int id, URI feedUri, String title, URI link, LocalDateTime publicationDate, String content) {
+        this.id = id;
+        this.feedUri = feedUri;
+        this.title = title;
+        this.link = link;
+        this.publicationDate = publicationDate;
+        this.content = content;
+    }
+
+    public Article(URI feedUri, String title, URI link, LocalDateTime publicationDate, String content) {
+        this(0, feedUri, title, link, publicationDate, content);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public URI getFeedUri() {
+        return feedUri;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public LocalDateTime getPublicationDate() {
+        return publicationDate;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public URI getLink() {
+        return link;
+    }
+    
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return title;
+    }
+}
+
+main\java\org\rssreader\models\Feed.java tartalma:
+package org.rssreader.models;
+
+import java.net.URI;
+
+public class Feed {
+    private final String name;
+    private final URI uri;
+    private final int refreshIntervalMin;
+
+    public Feed(String name, URI uri, int refreshIntervalMin) {
+        this.name = name;
+        this.uri = uri;
+        this.refreshIntervalMin = refreshIntervalMin;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public URI getUri() {
+        return uri;
+    }
+
+    public int getRefreshIntervalMin() {
+        return refreshIntervalMin;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+}
+
+main\java\org\rssreader\models\User.java tartalma:
+package org.rssreader.models;
+
+public class User {
+
+    private final String username;
+    private String password;
+    private String email;
+
+    public User(String username, String password, String email) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
+
+    @Override
+    public String toString() {
+        return "User{"
+                + ", username='" + username + '\''
+                + ", email='" + email + '\''
+                + '}';
+    }
+
+    public String getUsername() {
+
+        return username;
+    }
+
+    public String getEmail() {
+
+        return email;
+    }
+
+    public String getPassword() {
+
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((username == null) ? 0 : username.hashCode());
+        result = prime * result + ((password == null) ? 0 : password.hashCode());
+        result = prime * result + ((email == null) ? 0 : email.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        User other = (User) obj;
+        if (username == null) {
+            if (other.username != null)
+                return false;
+        } else if (!username.equals(other.username))
+            return false;
+        if (password == null) {
+            if (other.password != null)
+                return false;
+        } else if (!password.equals(other.password))
+            return false;
+        if (email == null) {
+            if (other.email != null)
+                return false;
+        } else if (!email.equals(other.email))
+            return false;
+        return true;
+    }
+
+}
+
+main\java\org\rssreader\models\UserArticle.java tartalma:
+package org.rssreader.models;
+
+import java.time.LocalDateTime;
+
+import org.rssreader.dao.UserArticleDAO;
+
+public class UserArticle {
+    private final User user;
+    private final Article article;
+    private boolean isFavorite;
+    private boolean isRead;
+    private final LocalDateTime updatedAt;
+
+    public UserArticle(User user, Article article, boolean isFavorite, boolean isRead, LocalDateTime updatedAt) {
+        this.user = user;
+        this.article = article;
+        this.isFavorite = isFavorite;
+        this.isRead = isRead;
+        this.updatedAt = updatedAt;
+    }
+
+    public User getUsername() {
+        return user;
+    }
+
+    public Article getArticle() {
+        return article;
+    }
+
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public boolean isRead() {
+        return isRead;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setRead() {
+        if (UserArticleDAO.setRead(user, article))
+            isRead=true;
+    }
+    public void setFavorite() {
+        if (UserArticleDAO.setFavorite(user, article))
+            isFavorite=true;
+    }
+
+    @Override
+    public String toString() {
+        return user.getUsername() + "-" + article;
+    }
+}
+
+main\java\org\rssreader\service\ArticleService.java tartalma:
+package org.rssreader.service;
+
+import org.rssreader.models.Article;
+import org.rssreader.models.Feed;
+import org.rssreader.util.LogUtil;
+import org.rssreader.util.RssParser;
+
+import java.util.Collections;
+import java.util.List;
+
+public class ArticleService {
+    private final FeedService feedService = new FeedService();
+    private final RssParser rssParser = new RssParser();
+
+    public List<Article> getArticlesByFeed(Feed feedToGet) {
+        Feed feed = feedService.getAllFeeds().stream()
+                .filter(f -> f.getUri() == feedToGet.getUri())
+                .findFirst()
+                .orElse(null);
+        if (feed == null) {
+            LogUtil.getLogger(ArticleService.class)
+                    .warn("Feed not found for url: {}", feedToGet.getUri());
+            return Collections.emptyList();
+        }
+        try {
+            return rssParser.parse(feed.getUri());
+        } catch (Exception e) {
+            LogUtil.getLogger(ArticleService.class)
+                    .error("Failed to parse RSS feed: {}", feed.getUri(), e);
+            return Collections.emptyList();
+        }
+    }
+}
+
+
+
+
+/*
+public List<Article> getArticlesByFeed(int feedId) {
+    return List.of(
+            new Article(1, feedId, "Első cikk", LocalDateTime.now().minusDays(1), "Ez az első cikk tartalma."),
+            new Article(2, feedId, "Második cikk", LocalDateTime.now(), "Ez a második cikk tartalma.")
+    );
+}*/
+
+main\java\org\rssreader\service\FeedService.java tartalma:
+package org.rssreader.service;
+
+import org.rssreader.models.Feed;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class FeedService {
+    private static final FeedService INSTANCE = new FeedService();
+
+    public static FeedService getInstance() {
+        return INSTANCE;
+    }
+
+    private final List<Feed> feeds = new ArrayList<>();
+
+    public FeedService() {
+        // Kezdeti stub adatok
+        try {
+            feeds.add(new Feed("Example RSS", new URI("https://example.com/rss"), 30));
+            feeds.add(new Feed("News Feed", new URI("https://news.example.com/rss"), 15));
+            feeds.add(new Feed("Real feed", new URI("https://news.un.org/feed/subscribe/en/news/all/rss.xml"), 15));
+        } catch (URISyntaxException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
+
+    public List<Feed> getAllFeeds() {
+        return Collections.unmodifiableList(feeds);
+    }
+
+    public void addFeed(Feed feed) {
+        feeds.add(feed);
+    }
+
+    public void deleteFeed(URI uri) {
+        feeds.removeIf(f -> f.getUri() == uri);
+    }
+}
+
+main\java\org\rssreader\util\LogUtil.java tartalma:
+// src/main/java/org/rssreader/util/LogUtil.java
+package org.rssreader.util;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+public class LogUtil {
+    public static Logger getLogger(Class<?> clazz) {
+        return LogManager.getLogger(clazz);
+    }
+}
+
+main\java\org\rssreader\util\NotificationUtil.java tartalma:
+package org.rssreader.util;
+
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+
+public class NotificationUtil {
+    public static void showInfo(String title, String message) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle(title);
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+            alert.showAndWait();
+        });
+    }
+
+    public static void showError(String title, String message) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle(title);
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+            alert.showAndWait();
+        });
+    }
+}
+
+main\java\org\rssreader\util\RssParser.java tartalma:
+package org.rssreader.util;
+
+import com.rometools.rome.feed.synd.SyndContent;
+import com.rometools.rome.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndFeed;
+import com.rometools.rome.io.SyndFeedInput;
+import com.rometools.rome.io.XmlReader;
+import org.rssreader.models.Article;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class RssParser {
+    public List<Article> parse(URI feedUri) throws Exception {
+        SyndFeed feed = new SyndFeedInput().build(new XmlReader(feedUri.toURL()));
+        return feed.getEntries().stream()
+                .map(entry -> toArticle(entry, feedUri))
+                .collect(Collectors.toList());
+    }
+
+    private Article toArticle(SyndEntry entry, URI feedUri) {
+        String content = "";
+
+        if (entry.getDescription() != null && entry.getDescription().getValue() != null) {
+            content = entry.getDescription().getValue();
+        } else if (entry.getContents() != null && !entry.getContents().isEmpty()) {
+            content = entry.getContents().stream()
+                    .map(SyndContent::getValue)
+                    .collect(Collectors.joining(" "));
+        }
+
+        URI linkUri;
+        try {
+            linkUri = entry.getLink() != null ? new URI(entry.getLink()) : new URI("http://unknown.link");
+        } catch (URISyntaxException e) {
+            linkUri = URI.create("http://invalid.link");
+        }
+
+        return new Article(
+                feedUri,
+                entry.getTitle(),
+                linkUri,
+                entry.getPublishedDate() != null
+                        ? entry.getPublishedDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+                        : LocalDateTime.now(),
+                content
+        );
+    }
+
+}
+
+main\java\org\rssreader\util\RssParserTest.java tartalma:
+package org.rssreader.util;
+
+import org.rssreader.models.Article;
+
+import java.net.URI;
+import java.util.List;
+
+public class RssParserTest {
+    public static void main(String[] args) {
+        RssParser parser = new RssParser();
+        try {
+            // Tedd be egy valós, élő RSS URL-t
+            List<Article> articles = parser.parse(new URI("https://news.un.org/feed/subscribe/en/news/all/rss.xml"));
+            articles.forEach(a -> {
+                System.out.println("Cím: " + a.getTitle());
+                System.out.println("Dátum: " + a.getPublicationDate());
+                System.out.println("-----");
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+

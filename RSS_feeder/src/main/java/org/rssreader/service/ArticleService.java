@@ -9,12 +9,13 @@ import java.util.Collections;
 import java.util.List;
 
 public class ArticleService {
-    private final FeedService feedService = new FeedService();
+    //private final FeedService feedService = new FeedService();
+    private final FeedService feedService = FeedService.getInstance();
     private final RssParser rssParser = new RssParser();
 
     public List<Article> getArticlesByFeed(Feed feedToGet) {
         Feed feed = feedService.getAllFeeds().stream()
-                .filter(f -> f.getUri() == feedToGet.getUri())
+                .filter(f -> f.getUri() .equals(feedToGet.getUri()))
                 .findFirst()
                 .orElse(null);
         if (feed == null) {
