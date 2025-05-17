@@ -1,83 +1,71 @@
 package org.rssreader.models;
 
+import java.time.LocalDateTime;
+import java.util.Objects;
+
 public class User {
-
     private final String username;
-    private String password;
+    private final String password;      // a sima jelszó, amit a DAO hash-el
     private String email;
+    private LocalDateTime createdAt;    // DB-ből lekért regisztrációs idő
 
+    // Regisztrációkor: a createdAt még null, DAO állítja be az INSERT után
     public User(String username, String password, String email) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
+        this(username, password, email, null);
     }
 
-    @Override
-    public String toString() {
-        return "User{"
-                + ", username='" + username + '\''
-                + ", email='" + email + '\''
-                + '}';
+    // AuthUser után: a createdAt-ot is betölti a DAO
+    public User(String username, String password, String email, LocalDateTime createdAt) {
+        this.username  = username;
+        this.password  = password;
+        this.email     = email;
+        this.createdAt = createdAt;
     }
 
     public String getUsername() {
-
         return username;
     }
 
-    public String getEmail() {
-
-        return email;
-    }
-
+    /** A tiszta (nem hash-elt) jelszó, amit a DAO ellenőriz és hash-el */
     public String getPassword() {
-
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public String getEmail() {
+        return email;
+    }
+
+    /** A regisztráció időpontja (DB→DAO→modell) */
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     public void setEmail(String email) {
         this.email = email;
     }
 
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        User u = (User) o;
+        return Objects.equals(username, u.username)
+                && Objects.equals(password, u.password)
+                && Objects.equals(email,    u.email);
+        // createdAt-t nem vesszük bele az equals-ba, hogy a DAO-testek működjenek
+    }
+
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((username == null) ? 0 : username.hashCode());
-        result = prime * result + ((password == null) ? 0 : password.hashCode());
-        result = prime * result + ((email == null) ? 0 : email.hashCode());
-        return result;
+        return Objects.hash(username, password, email);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        User other = (User) obj;
-        if (username == null) {
-            if (other.username != null)
-                return false;
-        } else if (!username.equals(other.username))
-            return false;
-        if (password == null) {
-            if (other.password != null)
-                return false;
-        } else if (!password.equals(other.password))
-            return false;
-        if (email == null) {
-            if (other.email != null)
-                return false;
-        } else if (!email.equals(other.email))
-            return false;
-        return true;
+    public String toString() {
+        return "User{username='" + username + "', email='" + email + "'}";
     }
-
 }

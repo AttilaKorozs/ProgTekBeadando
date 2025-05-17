@@ -57,67 +57,84 @@ src/
 ---
 
 ### 3. Adatbázismodell
-
-| Tábla           | Mezők                                                                                           |
-| --------------- |-------------------------------------------------------------------------------------------------|
-| **Feed**        | `id` (PK), `name`, `url`, `refresh_interval_min`                                                |
-| **Article**     | `id` (PK), `feed_id` (FK→Feed.id), `title`, `link`, `publication_date`, `content`               |
-| **UserArticle** | `user` (FK→User.username), `article_id` (FK→Article.id), `is_favorite`, `is_read`, `updated_at` |
-| **User** | `username`(PK), `password_hash`, `email`,`created_at`                                                           |
-
--- (1) Feed tábla
-CREATE TABLE `Feed` (
-`id` INT AUTO_INCREMENT PRIMARY KEY,
-`name` VARCHAR(255) NOT NULL,
-`url` VARCHAR(512) NOT NULL,
-`refresh_interval_min` INT NOT NULL,
-UNIQUE KEY `uq_feed_url` (`url`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- (2) Article tábla
-CREATE TABLE `Article` (
-`id` INT AUTO_INCREMENT PRIMARY KEY,
-`feed_id` INT NOT NULL,
-`title` VARCHAR(512) NOT NULL,
-`link` VARCHAR(1024) NOT NULL,
-`publication_date` DATETIME NOT NULL,
-`content` TEXT,
-UNIQUE KEY `uq_article_link` (`link`),
-KEY `idx_article_feed` (`feed_id`),
-KEY `idx_article_pubdate` (`publication_date`),
-CONSTRAINT `fk_article_feed`
-FOREIGN KEY (`feed_id`) REFERENCES `Feed` (`id`)
-ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- (3) User tábla
-CREATE TABLE `User` (
-`username` VARCHAR(100) NOT NULL PRIMARY KEY,
-`password_hash` VARCHAR(255) NOT NULL,
-`email` VARCHAR(255) NOT NULL,
-`created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
-UNIQUE KEY `uq_user_email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- (4) UserArticle tábla
-CREATE TABLE `UserArticle` (
-`user` VARCHAR(100) NOT NULL,
-`article_id` INT NOT NULL,
-`is_favorite` TINYINT(1) DEFAULT 0,
-`is_read` TINYINT(1) DEFAULT 0,
-`updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-PRIMARY KEY (`user`,`article_id`),
-CONSTRAINT `fk_userarticle_user`
-FOREIGN KEY (`user`) REFERENCES `User` (`username`)
-ON DELETE CASCADE,
-CONSTRAINT `fk_userarticle_article`
-FOREIGN KEY (`article_id`) REFERENCES `Article` (`id`)
-ON DELETE CASCADE,
-KEY `idx_ua_favorite` (`is_favorite`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
+Az adatbázisod jelenleg négy táblából áll, az alábbi szerkezettel:
 
 ---
+
+#### Feed
+
+* **Mezők**
+
+  * `url` VARCHAR(512) – a feed egyedi azonosítója (primer kulcs)
+  * `name` VARCHAR(255) – a feed megjelenítendő neve
+  * `refresh_interval_min` INT(11) – frissítés gyakorisága percekben
+
+* **Primér kulcs**: `url`
+
+---
+
+#### Article
+
+* **Mezők**
+
+  * `id` INT(11) AUTO\_INCREMENT – a cikk egyedi száma (primer kulcs)
+  * `feed_url` VARCHAR(512) – hivatkozás a `Feed.url`-re (idegen kulcs)
+  * `title` VARCHAR(512) – a cikk címe
+  * `link` VARCHAR(1024) – a cikk webcíme
+  * `publication_date` DATETIME – megjelenés dátuma/időpontja
+  * `content` TEXT – a cikk teljes szövege
+
+* **Primér kulcs**: `id`
+
+* **Idegen kulcs**:
+
+  * `feed_url` → `Feed(url)` (ON DELETE CASCADE javasolt)
+
+---
+
+#### User
+
+* **Mezők**
+
+  * `username` VARCHAR(100) – a felhasználó azonosítója (primer kulcs)
+  * `password_hash` VARCHAR(255) – titkosított jelszó (bcrypt hash)
+  * `email` VARCHAR(255) – e-mail cím
+  * `created_at` DATETIME – regisztráció időpontja (alapértelmezett: CURRENT\_TIMESTAMP)
+
+* **Primér kulcs**: `username`
+
+* **Egyedi index**: `email`
+
+---
+
+#### UserArticle
+
+* **Mezők**
+
+  * `user` VARCHAR(100) – hivatkozás a `User.username`-re (idegen kulcs)
+  * `article_id` INT(11) – hivatkozás az `Article.id`-re (idegen kulcs)
+  * `is_favorite` TINYINT(1) DEFAULT 0 – kedvenc státusz
+  * `is_read` TINYINT(1) DEFAULT 0 – olvasott státusz
+  * `updated_at` DATETIME DEFAULT CURRENT\_TIMESTAMP ON UPDATE CURRENT\_TIMESTAMP – utolsó módosítás időpontja
+
+* **Kompozit primér kulcs**: (`user`, `article_id`)
+
+* **Idegen kulcsok**:
+
+  * `user` → `User(username)`
+  * `article_id` → `Article(id)`
+
+---
+
+#### Kapcsolatok összefoglalva
+
+* **Feed (1) ↔ Article (N)**
+
+  * Minden cikkhez tartozik egy feed a `feed_url` mezőn keresztül.
+* **User (1) ↔ Article (N) – many-to-many UserArticle**
+
+  * A `UserArticle` tábla kezeli a felhasználók kedvencei (`is_favorite`) és olvasott státuszait (`is_read`).
+
 
 ### 4. Tervezési minták
 

@@ -9,7 +9,7 @@ import org.rssreader.models.User;
 
 public class UserDAO {
 
-    public static void addUser(User user) {
+    public static boolean addUser(User user) {
         String sql = "INSERT INTO User (username, password_hash, email) VALUES (?, ?, ?)";
         String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
 
@@ -20,9 +20,11 @@ public class UserDAO {
             stmt.setString(3, user.getEmail());
 
             stmt.executeUpdate();
+            return  true;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     public static User authUser(User user) {

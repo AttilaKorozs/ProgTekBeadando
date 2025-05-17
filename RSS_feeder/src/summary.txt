@@ -235,7 +235,7 @@ main\resources\fxml\feed.fxml tartalma:
     <center>
         <TableView fx:id="feedTable">
             <columns>
-                <TableColumn text="ID" fx:id="colId" />
+
                 <TableColumn text="Név" fx:id="colName" />
                 <TableColumn text="URL" fx:id="colUrl" />
                 <TableColumn text="Frissítés (perc)" fx:id="colInterval" />
@@ -243,6 +243,34 @@ main\resources\fxml\feed.fxml tartalma:
         </TableView>
     </center>
 </BorderPane>
+
+
+main\resources\fxml\login.fxml tartalma:
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane xmlns="http://javafx.com/javafx/20"
+          xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="org.rssreader.controller.LoginController"
+          hgap="10" vgap="10" padding="20">
+
+    <Label text="Username:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+    <TextField fx:id="txtUsername" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+    <Label text="Password:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+    <PasswordField fx:id="txtPassword" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+    <Label text="Email:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+    <TextField fx:id="txtEmail" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+    <HBox spacing="10" GridPane.rowIndex="3" GridPane.columnIndex="1" alignment="CENTER_RIGHT">
+        <Button text="Login"    onAction="#handleLogin"/>
+        <Button text="Register" onAction="#handleRegister"/>
+    </HBox>
+</GridPane>
 
 
 main\resources\fxml\main.fxml tartalma:
@@ -276,7 +304,7 @@ import javafx.stage.Stage;
 public class App extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
         Scene scene = new Scene(loader.load());
         primaryStage.setTitle("RSS Feeder");
         primaryStage.setScene(scene);
@@ -385,7 +413,7 @@ public class FeedController {
     private final FeedService feedService = FeedService.getInstance();
 
     @FXML public void initialize() {
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        //colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colUrl.setCellValueFactory(new PropertyValueFactory<>("url"));
         colInterval.setCellValueFactory(new PropertyValueFactory<>("refreshIntervalMin"));
@@ -445,6 +473,96 @@ public class FeedController {
         }
     }
 }
+
+main\java\org\rssreader\controller\LoginController.java tartalma:
+package org.rssreader.controller;
+
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.*;
+import javafx.scene.control.*;
+import javafx.stage.Stage;
+import org.rssreader.dao.UserDAO;
+import org.rssreader.models.User;
+import org.rssreader.util.Session;
+
+import java.io.IOException;
+
+/**
+ * Kezeli a bejelentkezést és regisztrációt.
+ */
+public class LoginController {
+
+    @FXML private TextField txtUsername;
+    @FXML private PasswordField txtPassword;
+    @FXML private TextField txtEmail;
+
+    // a DAO statikus metódusokat használ
+    private final UserDAO userDAO = new UserDAO();
+
+    @FXML
+    private void handleLogin(ActionEvent event) {
+        String username = txtUsername.getText().trim();
+        String password = txtPassword.getText();
+
+        // A DAO authUser(User) metódusát így kell hívni:
+        User attempt = new User(username, password, null);
+        User user = userDAO.authUser(attempt);
+
+        if (user != null) {
+            // beállítjuk a session-be
+            Session.setCurrentUser(user);
+            // és elindítjuk a főnézetet
+            openMainView(event);
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Login failed", "Invalid username or password.");
+        }
+    }
+
+    @FXML
+    private void handleRegister(ActionEvent event) {
+        String username = txtUsername.getText().trim();
+        String password = txtPassword.getText();
+        String email    = txtEmail.getText().trim();
+
+        if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Validation", "Please fill all fields.");
+            return;
+        }
+
+        // itt az addUser(User) várt paraméterrel
+        User newUser = new User(username, password, email);
+        boolean ok = userDAO.addUser(newUser);
+
+        if (ok) {
+            showAlert(Alert.AlertType.INFORMATION, "Registration", "User registered successfully.");
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Registration", "Could not register user.");
+        }
+    }
+
+    private void openMainView(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Load Error", e.getMessage());
+        }
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String msg) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(msg);
+        alert.showAndWait();
+    }
+}
+
 
 main\java\org\rssreader\controller\MainController.java tartalma:
 package org.rssreader.controller;
@@ -830,7 +948,7 @@ import org.rssreader.models.User;
 
 public class UserDAO {
 
-    public static void addUser(User user) {
+    public static boolean addUser(User user) {
         String sql = "INSERT INTO User (username, password_hash, email) VALUES (?, ?, ?)";
         String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
 
@@ -841,9 +959,11 @@ public class UserDAO {
             stmt.setString(3, user.getEmail());
 
             stmt.executeUpdate();
+            return  true;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     public static User authUser(User user) {
@@ -990,6 +1110,11 @@ public class Feed {
         return uri;
     }
 
+
+    public String getUrl() {
+        return uri.toString();
+    }
+
     public int getRefreshIntervalMin() {
         return refreshIntervalMin;
     }
@@ -1003,87 +1128,76 @@ public class Feed {
 main\java\org\rssreader\models\User.java tartalma:
 package org.rssreader.models;
 
+import java.time.LocalDateTime;
+import java.util.Objects;
+
 public class User {
-
     private final String username;
-    private String password;
+    private final String password;      // a sima jelszó, amit a DAO hash-el
     private String email;
+    private LocalDateTime createdAt;    // DB-ből lekért regisztrációs idő
 
+    // Regisztrációkor: a createdAt még null, DAO állítja be az INSERT után
     public User(String username, String password, String email) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
+        this(username, password, email, null);
     }
 
-    @Override
-    public String toString() {
-        return "User{"
-                + ", username='" + username + '\''
-                + ", email='" + email + '\''
-                + '}';
+    // AuthUser után: a createdAt-ot is betölti a DAO
+    public User(String username, String password, String email, LocalDateTime createdAt) {
+        this.username  = username;
+        this.password  = password;
+        this.email     = email;
+        this.createdAt = createdAt;
     }
 
     public String getUsername() {
-
         return username;
     }
 
-    public String getEmail() {
-
-        return email;
-    }
-
+    /** A tiszta (nem hash-elt) jelszó, amit a DAO ellenőriz és hash-el */
     public String getPassword() {
-
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public String getEmail() {
+        return email;
+    }
+
+    /** A regisztráció időpontja (DB→DAO→modell) */
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     public void setEmail(String email) {
         this.email = email;
     }
 
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        User u = (User) o;
+        return Objects.equals(username, u.username)
+                && Objects.equals(password, u.password)
+                && Objects.equals(email,    u.email);
+        // createdAt-t nem vesszük bele az equals-ba, hogy a DAO-testek működjenek
+    }
+
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((username == null) ? 0 : username.hashCode());
-        result = prime * result + ((password == null) ? 0 : password.hashCode());
-        result = prime * result + ((email == null) ? 0 : email.hashCode());
-        return result;
+        return Objects.hash(username, password, email);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        User other = (User) obj;
-        if (username == null) {
-            if (other.username != null)
-                return false;
-        } else if (!username.equals(other.username))
-            return false;
-        if (password == null) {
-            if (other.password != null)
-                return false;
-        } else if (!password.equals(other.password))
-            return false;
-        if (email == null) {
-            if (other.email != null)
-                return false;
-        } else if (!email.equals(other.email))
-            return false;
-        return true;
+    public String toString() {
+        return "User{username='" + username + "', email='" + email + "'}";
     }
-
 }
+
 
 main\java\org\rssreader\models\UserArticle.java tartalma:
 package org.rssreader.models;
@@ -1154,12 +1268,13 @@ import java.util.Collections;
 import java.util.List;
 
 public class ArticleService {
-    private final FeedService feedService = new FeedService();
+    //private final FeedService feedService = new FeedService();
+    private final FeedService feedService = FeedService.getInstance();
     private final RssParser rssParser = new RssParser();
 
     public List<Article> getArticlesByFeed(Feed feedToGet) {
         Feed feed = feedService.getAllFeeds().stream()
-                .filter(f -> f.getUri() == feedToGet.getUri())
+                .filter(f -> f.getUri() .equals(feedToGet.getUri()))
                 .findFirst()
                 .orElse(null);
         if (feed == null) {
@@ -1352,6 +1467,27 @@ public class RssParserTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+}
+
+
+main\java\org\rssreader\util\Session.java tartalma:
+package org.rssreader.util;
+
+import org.rssreader.models.User;
+
+/**
+ * Egyszerű singleton session-tároló a bejelentkezett felhasználó számára.
+ */
+public class Session {
+    private static User currentUser;
+
+    public static User getCurrentUser() {
+        return currentUser;
+    }
+
+    public static void setCurrentUser(User user) {
+        currentUser = user;
     }
 }
 
