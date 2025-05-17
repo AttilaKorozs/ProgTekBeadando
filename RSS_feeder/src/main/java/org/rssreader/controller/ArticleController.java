@@ -1,27 +1,38 @@
 package org.rssreader.controller;
 
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.util.converter.DefaultStringConverter;
+import org.rssreader.dao.UserArticleDAO;
+import org.rssreader.models.Article;
 import org.rssreader.models.Feed;
+import org.rssreader.models.UserArticle;
 import org.rssreader.service.ArticleService;
 import org.rssreader.service.FeedService;
 import org.rssreader.service.decorator.ArticleComponent;
+import org.rssreader.service.decorator.BasicArticleComponent;
+import org.rssreader.service.decorator.CachedFavoriteDecorator;
+import org.rssreader.service.decorator.CachedReadDecorator;
 import org.rssreader.service.filter.DateFilter;
 import org.rssreader.service.filter.FilterStrategy;
 import org.rssreader.service.filter.KeywordFilter;
 import org.rssreader.service.filter.TitleFilter;
+import org.rssreader.util.RssParser;
+import org.rssreader.util.Session;
 
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ArticleController {
@@ -122,9 +133,57 @@ public class ArticleController {
     }
 
     /** Betölti a cikkeket a kiválasztott Feed alapján. */
-    private void loadArticles(Feed feed) {
+    /*private void loadArticles(Feed feed) {
         originalArticles = articleService.getArticlesByFeed(feed);
         applyFilter();
+    }*/
+
+    @FXML
+    private void loadArticles(Feed feed) {
+        // 1. Letiltjuk az Apply gombot, amíg töltünk (opcionális UI visszajelzés)
+        btnApply.setDisable(true);
+        RssParser rssParser = new RssParser();
+        Task<List<Article>> fetchTask = new Task<>() {
+            @Override
+            protected List<Article> call() throws Exception {
+                // ez most már háttérszálon fut!
+                return rssParser.parse(feed.getUri());
+            }
+        };
+
+        fetchTask.setOnSucceeded(evt -> {
+            List<Article> articles = fetchTask.getValue();
+            // 2. Lekérdezzük egyszer a teljes státuszlistát
+            List<UserArticle> uaList = UserArticleDAO.getUserArticle(
+                    Session.getCurrentUser(), feed);
+            Map<Integer, UserArticle> statusMap = uaList.stream()
+                    .collect(Collectors.toMap(
+                            ua -> ua.getArticle().getId(),
+                            ua -> ua
+                    ));
+
+            // 3. Átalakítjuk ArticleComponent-ekké a cache-elt dekorátorokkal
+            originalArticles = articles.stream()
+                    .map(a -> new BasicArticleComponent(a))
+                    .map(c -> new CachedFavoriteDecorator(c, statusMap))
+                    .map(c -> new CachedReadDecorator(c, statusMap))
+                    .collect(Collectors.toList());
+
+            applyFilter();               // UI-frissítés (szűrés + table.setItems)
+            btnApply.setDisable(false);  // UI visszaengedése
+        });
+
+        fetchTask.setOnFailed(evt -> {
+            Throwable err = fetchTask.getException();
+            Platform.runLater(() -> {
+                new Alert(Alert.AlertType.ERROR,
+                        "Nem sikerült betölteni a feedet:\n" + err.getMessage())
+                        .showAndWait();
+                btnApply.setDisable(false);
+            });
+        });
+
+        new Thread(fetchTask, "rss-fetch-thread").start();
     }
 
     /** Alkalmazza a kiválasztott FilterStrategy-t az eredeti listára. */

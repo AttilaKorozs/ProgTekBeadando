@@ -43,9 +43,19 @@ public class UserArticle {
         if (UserArticleDAO.setRead(user, article))
             isRead=true;
     }
+
+    public void unsetRead() {
+        if (UserArticleDAO.setRead(user, article))
+            isRead=false;
+    }
     public void setFavorite() {
         if (UserArticleDAO.setFavorite(user, article))
             isFavorite=true;
+    }
+
+    public void unsetFavorite() {
+        if (UserArticleDAO.setFavorite(user, article))
+            isFavorite=false   ;
     }
 
     @Override
