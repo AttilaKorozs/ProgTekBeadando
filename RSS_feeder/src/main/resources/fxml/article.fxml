@@ -7,29 +7,40 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
 
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Button?>
 <AnchorPane xmlns="http://javafx.com/javafx/20"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.rssreader.controller.ArticleController">
     <children>
-        <!-- Feed lista -->
-        <ListView fx:id="feedList"
-                  layoutX="10" layoutY="10"
-                  prefWidth="150" prefHeight="380" />
 
+
+        <!-- Szűrési sáv -->
+        <HBox spacing="10" layoutX="10" layoutY="10" prefHeight="40" alignment="CENTER_LEFT">
+            <ChoiceBox fx:id="choiceFilter" prefWidth="120"/>
+            <TextField fx:id="txtKeyword" promptText="Keyword" visible="false"/>
+            <DatePicker fx:id="datePicker" visible="false"/>
+            <Button text="Apply" onAction="#onApplyFilter"/>
+        </HBox>
+
+
+        <!-- Feed lista -->
+        <ListView fx:id="feedList" layoutX="10" layoutY="60" prefWidth="150" prefHeight="350"/>
         <!-- Cikkek táblázat-->
-        <TableView fx:id="articleTable"
-                   layoutX="170" layoutY="10"
-                   prefWidth="420" prefHeight="250">
+        <TableView fx:id="articleTable" layoutX="170" layoutY="60" prefWidth="420" prefHeight="250">
             <columns>
                 <TableColumn fx:id="colTitle" text="Title" prefWidth="300"/>
                 <TableColumn fx:id="colDate"  text="Date"  prefWidth="120"/>
             </columns>
         </TableView>
-
         <!-- Cikk tartalom-->
-        <TextArea fx:id="txtContent"
-                  layoutX="170" layoutY="270"
-                  prefWidth="420" prefHeight="120"
-                  wrapText="true" />
+        <TextArea fx:id="txtContent" layoutX="170" layoutY="320" prefWidth="420" prefHeight="120" wrapText="true"/>
+
+
+
+
     </children>
 </AnchorPane>

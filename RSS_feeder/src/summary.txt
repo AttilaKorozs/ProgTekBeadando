@@ -1,3 +1,6 @@
+hianyzikmeg.md tartalma:
+
+
 test\java\org\rssreader\dao\ArticleDAOTest.java tartalma:
 package org.rssreader.dao;
 
@@ -188,30 +191,41 @@ main\resources\fxml\article.fxml tartalma:
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
 
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Button?>
 <AnchorPane xmlns="http://javafx.com/javafx/20"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.rssreader.controller.ArticleController">
     <children>
-        <!-- Feed lista -->
-        <ListView fx:id="feedList"
-                  layoutX="10" layoutY="10"
-                  prefWidth="150" prefHeight="380" />
 
+
+        <!-- Szűrési sáv -->
+        <HBox spacing="10" layoutX="10" layoutY="10" prefHeight="40" alignment="CENTER_LEFT">
+            <ChoiceBox fx:id="choiceFilter" prefWidth="120"/>
+            <TextField fx:id="txtKeyword" promptText="Keyword" visible="false"/>
+            <DatePicker fx:id="datePicker" visible="false"/>
+            <Button text="Apply" onAction="#onApplyFilter"/>
+        </HBox>
+
+
+        <!-- Feed lista -->
+        <ListView fx:id="feedList" layoutX="10" layoutY="60" prefWidth="150" prefHeight="350"/>
         <!-- Cikkek táblázat-->
-        <TableView fx:id="articleTable"
-                   layoutX="170" layoutY="10"
-                   prefWidth="420" prefHeight="250">
+        <TableView fx:id="articleTable" layoutX="170" layoutY="60" prefWidth="420" prefHeight="250">
             <columns>
                 <TableColumn fx:id="colTitle" text="Title" prefWidth="300"/>
                 <TableColumn fx:id="colDate"  text="Date"  prefWidth="120"/>
             </columns>
         </TableView>
-
         <!-- Cikk tartalom-->
-        <TextArea fx:id="txtContent"
-                  layoutX="170" layoutY="270"
-                  prefWidth="420" prefHeight="120"
-                  wrapText="true" />
+        <TextArea fx:id="txtContent" layoutX="170" layoutY="320" prefWidth="420" prefHeight="120" wrapText="true"/>
+
+
+
+
     </children>
 </AnchorPane>
 
@@ -253,10 +267,12 @@ main\resources\fxml\login.fxml tartalma:
 <?import javafx.scene.layout.*?>
 
 <GridPane xmlns="http://javafx.com/javafx/20"
-          xmlns:fx="http://javafx.com/fxml/1"
-          fx:controller="org.rssreader.controller.LoginController"
-          hgap="10" vgap="10" padding="20">
-
+                   xmlns:fx="http://javafx.com/fxml/1"
+                   fx:controller="org.rssreader.controller.LoginController"
+                   hgap="10" vgap="10">
+            <padding>
+      <Insets top="20" right="20" bottom="20" left="20"/>
+   </padding>
     <Label text="Username:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
     <TextField fx:id="txtUsername" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
@@ -326,11 +342,17 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.rssreader.models.Article;
 import org.rssreader.models.Feed;
 import org.rssreader.service.ArticleService;
+import org.rssreader.service.filter.*;
 import org.rssreader.service.FeedService;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class ArticleController {
+    @FXML private ChoiceBox<String> choiceFilter;
+    @FXML private TextField txtKeyword;
+    @FXML private DatePicker datePicker;
+
     @FXML private ListView<Feed> feedList;
     @FXML private TableView<Article> articleTable;
     @FXML private TableColumn<Article, String> colTitle;
@@ -339,43 +361,86 @@ public class ArticleController {
 
     private final FeedService feedService = FeedService.getInstance();
     private final ArticleService articleService = new ArticleService();
+    private List<Article> originalArticles;  // tábla eredeti tartalma
 
     @FXML
     public void initialize() {
-        // 1. Feed lista feltöltése
-        feedList.setItems(FXCollections.observableList(feedService.getAllFeeds()));
+        // ChoiceBox feltöltése
+        choiceFilter.setItems(FXCollections.observableArrayList(
+                "All", "Title", "Date", "Keyword"
+        ));
+        choiceFilter.getSelectionModel().selectFirst();
 
-        // 2. Táblázat konfigurálása
+        // Szűrő mezők elrejtése
+        txtKeyword.setVisible(false);
+        datePicker.setVisible(false);
+
+        // ChoiceBox váltás hatása
+        choiceFilter.getSelectionModel().selectedItemProperty().addListener((obs, old, choice) -> {
+            boolean isKeyword = choice.equals("Title") || choice.equals("Keyword");
+            txtKeyword.setVisible(isKeyword);
+            datePicker.setVisible(choice.equals("Date"));
+        });
+
+        // Táblázat oszlopok beállítása
         colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
-        colDate .setCellValueFactory(new PropertyValueFactory<>("publicationDate"));
+        colDate.setCellValueFactory(new PropertyValueFactory<>("publicationDate"));
 
-        // 3. Lista kiválasztás‐változás listener
+        // Feed lista feltöltése és kiválasztási listener
+        feedList.setItems(FXCollections.observableList(feedService.getAllFeeds()));
         feedList.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldF, newF) -> {
                     if (newF != null) loadArticles(newF);
                 });
 
-        // 4. Tábla sor kiválasztás‐változás listener
-        articleTable.getSelectionModel().selectedItemProperty()
-                .addListener((obs, oldA, newA) -> {
-                    if (newA != null) txtContent.setText(newA.getContent());
-                });
-
-        // 5. Alapértelmezett első feed kiválasztása
+        // Alapértelmezett feed kiválasztása
         if (!feedList.getItems().isEmpty()) {
             feedList.getSelectionModel().selectFirst();
         }
+
+        // Sor kiválasztása → tartalom megjelenítés
+        articleTable.getSelectionModel().selectedItemProperty()
+                .addListener((obs, oldA, newA) -> {
+                    txtContent.setText(newA != null ? newA.getContent() : "");
+                });
     }
 
+    /** Betölti a cikkeket és elmenti a teljes listát. */
     private void loadArticles(Feed feed) {
-        List<Article> articles = articleService.getArticlesByFeed(feed);
-        articleTable.setItems(FXCollections.observableList(articles));
-        txtContent.clear();
-        // Opcionálisan az első cikkre is rákattintunk
-        if (!articles.isEmpty()) {
+        originalArticles = articleService.getArticlesByFeed(feed);
+        applyFilter();
+    }
+
+    /** Szűrés lefuttatása a kiválasztott stratégia szerint. */
+    @FXML
+    private void onApplyFilter() {
+        applyFilter();
+    }
+
+    private void applyFilter() {
+        String choice = choiceFilter.getValue();
+        FilterStrategy strategy;
+
+        switch (choice) {
+            case "Title":
+                strategy = new TitleFilter(txtKeyword.getText());
+                break;
+            case "Keyword":
+                strategy = new KeywordFilter(txtKeyword.getText());
+                break;
+            case "Date":
+                LocalDate d = datePicker.getValue();
+                strategy = new DateFilter(d);
+                break;
+            default:  // "All"
+                strategy = articles -> articles;
+        }
+
+        List<Article> filtered = strategy.filter(originalArticles);
+        articleTable.setItems(FXCollections.observableList(filtered));
+        if (!filtered.isEmpty()) {
             articleTable.getSelectionModel().selectFirst();
         }
-            
     }
 }
 
@@ -1488,6 +1553,95 @@ public class Session {
 
     public static void setCurrentUser(User user) {
         currentUser = user;
+    }
+}
+
+
+main\java\org\rssreader\service\filter\DateFilter.java tartalma:
+package org.rssreader.service.filter;
+
+import org.rssreader.models.Article;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class DateFilter implements FilterStrategy {
+    private final LocalDate date;
+
+    public DateFilter(LocalDate date) {
+        this.date = date;
+    }
+
+    @Override
+    public List<Article> filter(List<Article> articles) {
+        if (date == null) return articles;
+        return articles.stream()
+                .filter(a -> a.getPublicationDate() != null
+                        && a.getPublicationDate().toLocalDate().equals(date))
+                .collect(Collectors.toList());
+    }
+}
+
+
+main\java\org\rssreader\service\filter\FilterStrategy.java tartalma:
+package org.rssreader.service.filter;
+
+import org.rssreader.models.Article;
+import java.util.List;
+
+public interface FilterStrategy {
+    /**
+     * Visszaadja a bemeneti lista azon elemeit, amelyek megfelelnek a stratégiának.
+     */
+    List<Article> filter(List<Article> articles);
+}
+
+
+main\java\org\rssreader\service\filter\KeywordFilter.java tartalma:
+package org.rssreader.service.filter;
+
+import org.rssreader.models.Article;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class KeywordFilter implements FilterStrategy {
+    private final String keyword;
+
+    public KeywordFilter(String keyword) {
+        this.keyword = keyword == null ? "" : keyword.toLowerCase();
+    }
+
+    @Override
+    public List<Article> filter(List<Article> articles) {
+        if (keyword.isBlank()) return articles;
+        return articles.stream()
+                .filter(a -> a.getContent() != null
+                        && a.getContent().toLowerCase().contains(keyword))
+                .collect(Collectors.toList());
+    }
+}
+
+
+main\java\org\rssreader\service\filter\TitleFilter.java tartalma:
+package org.rssreader.service.filter;
+
+import org.rssreader.models.Article;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class TitleFilter implements FilterStrategy {
+    private final String keyword;
+
+    public TitleFilter(String keyword) {
+        this.keyword = keyword == null ? "" : keyword.toLowerCase();
+    }
+
+    @Override
+    public List<Article> filter(List<Article> articles) {
+        if (keyword.isBlank()) return articles;
+        return articles.stream()
+                .filter(a -> a.getTitle().toLowerCase().contains(keyword))
+                .collect(Collectors.toList());
     }
 }
 
