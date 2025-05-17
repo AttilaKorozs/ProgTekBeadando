@@ -1,8 +1,10 @@
 # RSS Feed Reader 
 
-### Project Description
 
-We created a desktop application using JavaFX that allows users to read, manage, and filter RSS feeds. The feed and article data is stored in a MariaDB database
+## Project Description
+
+- The program was created as a project task for the program design technologies subject.
+- We created a desktop application using JavaFX that allows users to read, manage, and filter RSS feeds. The feed and article data is stored in a MariaDB database
 
 
 ### Creators
