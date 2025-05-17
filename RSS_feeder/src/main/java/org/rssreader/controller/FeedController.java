@@ -18,8 +18,12 @@ import org.rssreader.service.FeedService;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.rssreader.util.Session;
 
 public class FeedController {
+    private static final Logger logger = LogManager.getLogger(FeedController.class);
     @FXML private TableView<Feed> feedTable;
     @FXML private TableColumn<Feed, Integer> colId;
     @FXML private TableColumn<Feed, String> colName;
@@ -78,6 +82,9 @@ public class FeedController {
         Optional<Feed> result = dialog.showAndWait();
         result.ifPresent(feed -> {
             feedService.addFeed(feed);
+            logger.info("User '{}' added new feed with URL '{}'",
+                    Session.getCurrentUser().getUsername(),
+                    feed.getUrl());
             refreshTable();
         });
     }

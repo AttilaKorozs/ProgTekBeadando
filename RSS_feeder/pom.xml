@@ -57,12 +57,14 @@
             <version>5.12.1</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
+            <artifactId>junit-jupiter-params</artifactId>
             <version>5.12.1</version>
             <scope>test</scope>
         </dependency>
+
 
         <!-- JavaFX -->
         <dependency>
@@ -75,6 +77,8 @@
             <artifactId>javafx-fxml</artifactId>
             <version>20.0.1</version>
         </dependency>
+
+
 
         <!-- ROME RSS parser -->
         <dependency>

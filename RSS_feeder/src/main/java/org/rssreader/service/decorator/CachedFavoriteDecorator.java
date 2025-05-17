@@ -6,9 +6,13 @@ import org.rssreader.util.Session;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class CachedFavoriteDecorator extends ArticleDecorator {
     private final Map<Integer,UserArticle> statusMap;
+
+    private static final Logger logger = LogManager.getLogger(CachedFavoriteDecorator.class);
 
     public CachedFavoriteDecorator(ArticleComponent wrappee,
                                    Map<Integer,UserArticle> statusMap) {
@@ -33,10 +37,20 @@ public class CachedFavoriteDecorator extends ArticleDecorator {
                 ua = new UserArticle(
                         Session.getCurrentUser(), a, fav, false, LocalDateTime.now());
             } else {
-                if (fav) ua.setFavorite();
+                if (fav)
+                {
+                    ua.setFavorite();
+
+                }
                 else     ua.unsetFavorite(); // ha implementáltad
             }
+            logger.info("User '{}' set favorite={} for article '{}'",
+                    Session.getCurrentUser().getUsername(),
+                    fav,
+                    a.getTitle());
             return ua;
         });
+
+
     }
 }

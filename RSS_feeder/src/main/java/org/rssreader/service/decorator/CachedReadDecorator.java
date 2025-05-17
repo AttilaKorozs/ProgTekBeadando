@@ -6,9 +6,13 @@ import org.rssreader.util.Session;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 public class CachedReadDecorator extends ArticleDecorator {
     private final Map<Integer,UserArticle> statusMap;
+    private static final Logger logger = LogManager.getLogger(CachedReadDecorator.class);
 
     public CachedReadDecorator(ArticleComponent wrappee,
                                Map<Integer,UserArticle> statusMap) {
@@ -37,5 +41,9 @@ public class CachedReadDecorator extends ArticleDecorator {
             }
             return ua;
         });
+        logger.info("User '{}' set read={} for article '{}'",
+                Session.getCurrentUser().getUsername(),
+                read,
+                a.getTitle());
     }
 }

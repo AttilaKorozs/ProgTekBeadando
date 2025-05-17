@@ -1,0 +1,4 @@
+2025-05-17 15:59:57.484 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'peti' logged in
+2025-05-17 16:00:13.524 [JavaFX Application Thread] INFO  org.rssreader.controller.FeedController - User 'peti' added new feed with URL 'szia.hu'
+2025-05-17 16:00:52.520 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'peti' logged in
+2025-05-17 16:02:34.629 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'peti' logged in

@@ -6,6 +6,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.rssreader.dao.UserDAO;
 import org.rssreader.models.User;
 import org.rssreader.util.Session;
@@ -16,6 +19,7 @@ import java.io.IOException;
  * Kezeli a bejelentkezést és regisztrációt.
  */
 public class LoginController {
+    private static final Logger logger = LogManager.getLogger(LoginController.class);
 
     @FXML private TextField txtUsername;
     @FXML private PasswordField txtPassword;
@@ -36,10 +40,12 @@ public class LoginController {
         if (user != null) {
             // beállítjuk a session-be
             Session.setCurrentUser(user);
+            logger.info("User '{}' logged in", user.getUsername());
             // és elindítjuk a főnézetet
             openMainView(event);
         } else {
             showAlert(Alert.AlertType.ERROR, "Login failed", "Invalid username or password.");
+            logger.warn("Failed login attempt for username '{}'", username);
         }
     }
 
