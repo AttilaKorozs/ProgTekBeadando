@@ -7,12 +7,16 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.rssreader.models.Article;
 import org.rssreader.models.Feed;
 import org.rssreader.models.User;
 import org.rssreader.models.UserArticle;
+import org.rssreader.service.decorator.CachedFavoriteDecorator;
 
 public class UserArticleDAO {
+    private static final Logger logger = LogManager.getLogger(CachedFavoriteDecorator.class);
     public static List<UserArticle> getUserArticle(User user, Feed feed) {
         List<Article> articles = ArticleDAO.getArticle(feed);
         List<UserArticle> userArticles = new ArrayList<UserArticle>();
@@ -54,6 +58,7 @@ public class UserArticleDAO {
     }
 
     public static boolean setRead(User user, Article article, boolean isRead) {
+        logger.info("setRead meghívva");
         String selectSql = "SELECT 1 FROM UserArticle WHERE user = ? AND article_id = ?";
         String updateSql = "UPDATE UserArticle SET is_read = ? WHERE user = ? AND article_id = ?";
         String insertSql = "INSERT INTO UserArticle (user, article_id, is_read, is_favorite) VALUES (?, ?, ?, 0)";

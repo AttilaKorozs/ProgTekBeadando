@@ -1,5 +1,6 @@
 package org.rssreader.service.decorator;
 
+import org.rssreader.dao.UserArticleDAO;
 import org.rssreader.models.Article;
 import org.rssreader.models.UserArticle;
 import org.rssreader.util.Session;
@@ -29,15 +30,15 @@ public class CachedReadDecorator extends ArticleDecorator {
 
     @Override
     public void setRead(boolean read) {
-        super.setRead(read);  // DAO‐hívás
         Article a = wrappee.getModel();
+        UserArticleDAO.setRead(Session.getCurrentUser(), a, read);
         statusMap.compute(a.getId(), (id, ua) -> {
             if (ua == null) {
                 ua = new UserArticle(
                         Session.getCurrentUser(), a, false, read, LocalDateTime.now());
             } else {
                 if (read) ua.setRead();
-                else      ua.unsetRead(); // ha implementáltad
+                else      ua.unsetRead();
             }
             return ua;
         });

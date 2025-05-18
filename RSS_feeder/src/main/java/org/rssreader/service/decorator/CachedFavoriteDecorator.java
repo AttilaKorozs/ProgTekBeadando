@@ -1,5 +1,6 @@
 package org.rssreader.service.decorator;
 
+import org.rssreader.dao.UserArticleDAO;
 import org.rssreader.models.Article;
 import org.rssreader.models.UserArticle;
 import org.rssreader.util.Session;
@@ -10,12 +11,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class CachedFavoriteDecorator extends ArticleDecorator {
-    private final Map<Integer,UserArticle> statusMap;
+    private final Map<Integer, UserArticle> statusMap;
 
     private static final Logger logger = LogManager.getLogger(CachedFavoriteDecorator.class);
 
     public CachedFavoriteDecorator(ArticleComponent wrappee,
-                                   Map<Integer,UserArticle> statusMap) {
+            Map<Integer, UserArticle> statusMap) {
         super(wrappee);
         this.statusMap = statusMap;
     }
@@ -29,20 +30,18 @@ public class CachedFavoriteDecorator extends ArticleDecorator {
 
     @Override
     public void setFavorite(boolean fav) {
-        super.setFavorite(fav);  // ez hívja a DAO-t, ír a DB-be
-        // és frissítjük a cache-t is:
         Article a = wrappee.getModel();
+        UserArticleDAO.setFavorite(Session.getCurrentUser(), a, fav);
         statusMap.compute(a.getId(), (id, ua) -> {
             if (ua == null) {
                 ua = new UserArticle(
                         Session.getCurrentUser(), a, fav, false, LocalDateTime.now());
             } else {
-                if (fav)
-                {
+                if (fav) {
                     ua.setFavorite();
 
-                }
-                else     ua.unsetFavorite(); // ha implementáltad
+                } else
+                    ua.unsetFavorite(); // ha implementáltad
             }
             logger.info("User '{}' set favorite={} for article '{}'",
                     Session.getCurrentUser().getUsername(),
@@ -50,7 +49,6 @@ public class CachedFavoriteDecorator extends ArticleDecorator {
                     a.getTitle());
             return ua;
         });
-
 
     }
 }
