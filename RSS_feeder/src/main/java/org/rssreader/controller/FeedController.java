@@ -32,11 +32,9 @@ public class FeedController {
     @FXML private TableColumn<Feed, String> colUrl;
     @FXML private TableColumn<Feed, Integer> colInterval;
 
-    //private final FeedService feedService = new FeedService();
     private final FeedService feedService = FeedService.getInstance();
 
     @FXML public void initialize() {
-        //colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colUrl.setCellValueFactory(new PropertyValueFactory<>("url"));
         colInterval.setCellValueFactory(new PropertyValueFactory<>("refreshIntervalMin"));
@@ -74,7 +72,6 @@ public class FeedController {
                 try {
                     return new Feed(nameField.getText(), new URI(urlField.getText()), intervalSpinner.getValue());
                 } catch (URISyntaxException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }

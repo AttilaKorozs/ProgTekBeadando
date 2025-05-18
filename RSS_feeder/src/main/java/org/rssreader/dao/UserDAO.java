@@ -4,24 +4,31 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mindrot.jbcrypt.BCrypt;
+import org.rssreader.controller.FeedController;
 import org.rssreader.models.User;
 
 public class UserDAO {
+
+    private static final Logger logger = LogManager.getLogger(FeedController.class);
 
     public static boolean addUser(User user) {
         String sql = "INSERT INTO User (username, password_hash, email) VALUES (?, ?, ?)";
         String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
 
-        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, user.getUsername());
             stmt.setString(2, hashedPassword);
             stmt.setString(3, user.getEmail());
 
             stmt.executeUpdate();
-            return  true;
+            return true;
         } catch (Exception e) {
+            logger.warn("Failed to add user: '{}'", user);
             e.printStackTrace();
         }
         return false;
@@ -30,7 +37,8 @@ public class UserDAO {
     public static User authUser(User user) {
         String sql = "SELECT password_hash, email FROM User WHERE username = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, user.getUsername());
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -44,6 +52,7 @@ public class UserDAO {
                 return null;
             }
         } catch (Exception e) {
+            logger.warn("Failed to auth user: '{}'", user);
             e.printStackTrace();
             return null;
         }
@@ -52,12 +61,14 @@ public class UserDAO {
     public static boolean removeUser(User user) {
         String sql = "DELETE FROM User WHERE username = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, user.getUsername());
 
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
         } catch (Exception e) {
+            logger.warn("Failed to remove user: '{}'", user);
             e.printStackTrace();
             return false;
         }
@@ -67,7 +78,8 @@ public class UserDAO {
         String sql = "UPDATE User SET password_hash = ?, email = ? WHERE username = ?";
         String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
 
-        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, hashedPassword);
             stmt.setString(2, user.getEmail());
@@ -77,6 +89,7 @@ public class UserDAO {
             return rowsAffected > 0;
 
         } catch (Exception e) {
+            logger.warn("Failed to modify user: '{}'", user);
             e.printStackTrace();
             return false;
         }

@@ -10,10 +10,16 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.rssreader.controller.FeedController;
 import org.rssreader.models.Article;
 import org.rssreader.models.Feed;
+import org.rssreader.util.Session;
 
 public class ArticleDAO {
+
+    private static final Logger logger = LogManager.getLogger(FeedController.class);
 
     public static void storeArticle(Article article) {
         String sql = "INSERT INTO Article (feed_url, title, link, publication_date, content) VALUES (?, ?, ?, ?, ?)";
@@ -66,6 +72,9 @@ public class ArticleDAO {
                 }
             }
         } catch (Exception e) {
+            logger.warn("User '{}':Error while getting articles from: '{}'",
+                    Session.getCurrentUser().getUsername(),
+                    feed.getUrl());
             e.printStackTrace();
             return null;
         }
@@ -81,12 +90,19 @@ public class ArticleDAO {
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
-                System.out.println("Nem található cikk ezzel az ID-val: " + article.getId());
+                logger.warn("User '{}':A következő cikk nem található:'{}'",
+                        Session.getCurrentUser().getUsername(),
+                        article);
             } else {
-                System.out.println("Cikk sikeresen törölve. ID: " + article.getId());
+                logger.info("User '{}' törölte a következő cikket:",
+                        Session.getCurrentUser().getUsername(),
+                        article);
             }
 
         } catch (Exception e) {
+            logger.warn("User '{}':Error while removing article: '{}'",
+                    Session.getCurrentUser().getUsername(),
+                    article);
             e.printStackTrace();
         }
     }

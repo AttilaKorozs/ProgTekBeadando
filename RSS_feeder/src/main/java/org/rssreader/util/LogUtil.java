@@ -1,4 +1,3 @@
-// src/main/java/org/rssreader/util/LogUtil.java
 package org.rssreader.util;
 
 import org.apache.logging.log4j.LogManager;

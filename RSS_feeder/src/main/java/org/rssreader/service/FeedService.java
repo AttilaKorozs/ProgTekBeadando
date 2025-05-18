@@ -34,8 +34,6 @@ public class FeedService {
     public void deleteFeed(URI uri) {
         feeds.removeIf(f -> f.getUri() == uri);
     }
-
-    /** URI alapján visszaadja a pontos Feed példányt */
     public Feed getFeedByUri(URI uri) {
         return getAllFeeds().stream()
                 .filter(f -> f.getUri().equals(uri))

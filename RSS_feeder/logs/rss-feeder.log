@@ -94,3 +94,39 @@
 2025-05-18 16:52:16.119 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'peti' logged in
 2025-05-18 16:52:29.591 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - User 'peti' set favorite=true for article 'Elden Ring Nightreign - Bemutatkozik a Guardian'
 2025-05-18 16:52:40.420 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - User 'peti' set favorite=true for article 'Dual Mode-os, Mini LED-es IPS monitor jött az MSI műhelyéből'
+2025-05-18 16:57:17.209 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-18 16:57:28.091 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - User 'atix' set favorite=true for article 'Switch 2-re tarthat a Red Dead Redemption 2?'
+2025-05-18 16:57:33.751 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
+2025-05-18 16:57:33.813 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
+2025-05-18 16:57:33.827 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedReadDecorator - User 'atix' set read=true for article 'Switch 2-re tarthat a Red Dead Redemption 2?'
+2025-05-18 16:57:37.890 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - User 'atix' set favorite=false for article 'Switch 2-re tarthat a Red Dead Redemption 2?'
+2025-05-18 16:57:38.929 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
+2025-05-18 16:57:38.944 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
+2025-05-18 16:57:38.956 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedReadDecorator - User 'atix' set read=false for article 'Switch 2-re tarthat a Red Dead Redemption 2?'
+2025-05-18 16:57:39.784 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - User 'atix' set favorite=true for article 'Elden Ring Nightreign - Bemutatkozik a Guardian'
+2025-05-18 16:57:40.971 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
+2025-05-18 16:57:40.995 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
+2025-05-18 16:57:41.013 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedReadDecorator - User 'atix' set read=true for article 'Switch 2-re tarthat a Red Dead Redemption 2?'
+2025-05-18 16:57:41.562 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
+2025-05-18 16:57:41.582 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
+2025-05-18 16:57:41.605 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedReadDecorator - User 'atix' set read=true for article 'Dune Awakening - Középpontban a The Trooper'
+2025-05-18 16:57:43.880 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - User 'atix' set favorite=true for article 'Befellegzett a Call of Duty Warzone Mobile-nak'
+2025-05-18 17:06:15.948 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-18 17:06:22.656 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - User 'atix' set favorite=true for article 'Switch 2-re tarthat a Red Dead Redemption 2?'
+2025-05-18 17:06:24.591 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
+2025-05-18 17:06:24.629 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
+2025-05-18 17:06:24.649 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedReadDecorator - User 'atix' set read=true for article 'Dune Awakening - Középpontban a The Trooper'
+2025-05-18 17:06:24.882 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
+2025-05-18 17:06:24.917 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
+2025-05-18 17:06:24.930 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedReadDecorator - User 'atix' set read=true for article 'Elden Ring Nightreign - Bemutatkozik a Guardian'
+2025-05-18 17:23:49.588 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-18 17:23:58.695 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - User 'atix' set favorite=true for article 'Switch 2-re tarthat a Red Dead Redemption 2?'
+2025-05-18 17:31:43.471 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-18 17:31:54.571 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - User 'atix' set favorite=true for article 'Switch 2-re tarthat a Red Dead Redemption 2?'
+2025-05-18 17:31:54.916 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - User 'atix' set favorite=true for article 'Elden Ring Nightreign - Bemutatkozik a Guardian'
+2025-05-18 17:31:55.279 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - User 'atix' set favorite=true for article 'Befellegzett a Call of Duty Warzone Mobile-nak'
+2025-05-18 17:48:30.898 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-18 17:48:39.048 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - User 'atix' set favorite=true for article 'Switch 2-re tarthat a Red Dead Redemption 2?'
+2025-05-18 17:48:39.875 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
+2025-05-18 17:48:39.885 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
+2025-05-18 17:48:39.895 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedReadDecorator - User 'atix' set read=true for article 'Switch 2-re tarthat a Red Dead Redemption 2?'

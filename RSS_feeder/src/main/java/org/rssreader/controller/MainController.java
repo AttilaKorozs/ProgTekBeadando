@@ -1,7 +1,5 @@
 package org.rssreader.controller;
 
-
-
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -12,18 +10,21 @@ import org.apache.logging.log4j.Logger;
 public class MainController {
     private static final Logger logger = LogManager.getLogger(MainController.class);
 
-    @FXML private StackPane contentPane;
+    @FXML
+    private StackPane contentPane;
 
-    @FXML public void initialize() {
-        // Alapnézetként betölthetjük a feedek listáját
+    @FXML
+    public void initialize() {
         onShowFeeds();
     }
 
-    @FXML private void onShowFeeds() {
+    @FXML
+    private void onShowFeeds() {
         loadView("/fxml/feed.fxml");
     }
 
-    @FXML private void onShowArticles() {
+    @FXML
+    private void onShowArticles() {
         loadView("/fxml/article.fxml");
     }
 

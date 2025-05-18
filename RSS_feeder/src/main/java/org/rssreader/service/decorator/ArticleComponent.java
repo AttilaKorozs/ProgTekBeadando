@@ -13,12 +13,7 @@ public interface ArticleComponent {
 
     boolean isFavorite();
     boolean isRead();
-
-    /** Beállítja a kedvenc-státuszt (DAO hívás itt történik) */
     void setFavorite(boolean fav);
-
-    /** Beállítja az olvasott-státuszt (DAO hívás itt történik) */
     void setRead(boolean read);
-
     Article getModel();
 }

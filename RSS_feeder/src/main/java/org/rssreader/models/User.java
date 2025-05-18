@@ -56,7 +56,6 @@ public class User {
         return Objects.equals(username, u.username)
                 && Objects.equals(password, u.password)
                 && Objects.equals(email,    u.email);
-        // createdAt-t nem vesszük bele az equals-ba, hogy a DAO-testek működjenek
     }
 
     @Override

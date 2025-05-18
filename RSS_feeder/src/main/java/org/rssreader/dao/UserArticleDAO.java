@@ -17,6 +17,7 @@ import org.rssreader.service.decorator.CachedFavoriteDecorator;
 
 public class UserArticleDAO {
     private static final Logger logger = LogManager.getLogger(CachedFavoriteDecorator.class);
+
     public static List<UserArticle> getUserArticle(User user, Feed feed) {
         List<Article> articles = ArticleDAO.getArticle(feed);
         List<UserArticle> userArticles = new ArrayList<UserArticle>();
@@ -51,6 +52,9 @@ public class UserArticleDAO {
             rs = stmt.executeQuery();
 
         } catch (Exception e) {
+            logger.warn("User '{}':Failed to get User Data: '{}'",
+                    user,
+                    article);
             e.printStackTrace();
             return null;
         }
@@ -88,6 +92,9 @@ public class UserArticleDAO {
             }
 
         } catch (Exception e) {
+            logger.warn("User '{}':Failed to set Read State: '{}'",
+                    user,
+                    article);
             e.printStackTrace();
             return false;
         }
@@ -123,6 +130,9 @@ public class UserArticleDAO {
             }
 
         } catch (Exception e) {
+            logger.warn("User '{}':Failed to set Favorite State: '{}'",
+                    user,
+                    article);
             e.printStackTrace();
             return false;
         }

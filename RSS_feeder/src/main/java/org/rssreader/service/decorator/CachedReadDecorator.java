@@ -32,7 +32,7 @@ public class CachedReadDecorator extends ArticleDecorator {
     public void setRead(boolean read) {
         Article a = wrappee.getModel();
         UserArticleDAO.setRead(Session.getCurrentUser(), a, read);
-        statusMap.compute(a.getId(), (id, ua) -> {
+        statusMap.compute(a.getId(), (_, ua) -> {
             if (ua == null) {
                 ua = new UserArticle(
                         Session.getCurrentUser(), a, false, read, LocalDateTime.now());

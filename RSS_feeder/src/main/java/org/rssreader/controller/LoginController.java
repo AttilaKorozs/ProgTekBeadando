@@ -21,27 +21,23 @@ import java.io.IOException;
 public class LoginController {
     private static final Logger logger = LogManager.getLogger(LoginController.class);
 
-    @FXML private TextField txtUsername;
-    @FXML private PasswordField txtPassword;
-    @FXML private TextField txtEmail;
-
-    // a DAO statikus metódusokat használ
-    //private final UserDAO userDAO = new UserDAO();
+    @FXML
+    private TextField txtUsername;
+    @FXML
+    private PasswordField txtPassword;
+    @FXML
+    private TextField txtEmail;
 
     @FXML
     private void handleLogin(ActionEvent event) {
         String username = txtUsername.getText().trim();
         String password = txtPassword.getText();
-
-        // A DAO authUser(User) metódusát így kell hívni:
         User attempt = new User(username, password, null);
         User user = UserDAO.authUser(attempt);
 
         if (user != null) {
-            // beállítjuk a session-be
             Session.setCurrentUser(user);
             logger.info("User '{}' logged in", user.getUsername());
-            // és elindítjuk a főnézetet
             openMainView(event);
         } else {
             showAlert(Alert.AlertType.ERROR, "Login failed", "Invalid username or password.");
@@ -53,14 +49,13 @@ public class LoginController {
     private void handleRegister(ActionEvent event) {
         String username = txtUsername.getText().trim();
         String password = txtPassword.getText();
-        String email    = txtEmail.getText().trim();
+        String email = txtEmail.getText().trim();
 
         if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "Validation", "Please fill all fields.");
             return;
         }
 
-        // itt az addUser(User) várt paraméterrel
         User newUser = new User(username, password, email);
         boolean ok = UserDAO.addUser(newUser);
 
@@ -75,7 +70,12 @@ public class LoginController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
             Parent root = loader.load();
-            Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+            Scene scene = new Scene(root, 800, 600);
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(scene);
+            stage.setMinWidth(600);
+            stage.setMinHeight(400);
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {

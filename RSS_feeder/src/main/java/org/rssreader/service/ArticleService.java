@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 
 public class ArticleService {
-    //private final FeedService feedService = new FeedService();
     private final FeedService feedService = FeedService.getInstance();
     private final RssParser rssParser = new RssParser();
 
@@ -37,9 +36,6 @@ public class ArticleService {
         }
     }
 
-
-
-
     public List<ArticleComponent> getArticlesByFeed(Feed feed) {
         List<Article> articles;
         try {
@@ -50,7 +46,6 @@ public class ArticleService {
             return Collections.emptyList();
         }
 
-        // wrappelek BasicArticleComponent‐tel és dekorálok
         return articles.stream()
                 .map(a -> new BasicArticleComponent(a))
                 .map(ac -> new FavoriteDecorator(ac))
@@ -58,14 +53,3 @@ public class ArticleService {
                 .collect(Collectors.toList());
     }
 }
-
-
-
-
-/*
-public List<Article> getArticlesByFeed(int feedId) {
-    return List.of(
-            new Article(1, feedId, "Első cikk", LocalDateTime.now().minusDays(1), "Ez az első cikk tartalma."),
-            new Article(2, feedId, "Második cikk", LocalDateTime.now(), "Ez a második cikk tartalma.")
-    );
-}*/

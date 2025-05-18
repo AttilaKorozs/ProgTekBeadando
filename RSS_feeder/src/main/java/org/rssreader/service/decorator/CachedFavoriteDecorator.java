@@ -34,7 +34,7 @@ public class CachedFavoriteDecorator extends ArticleDecorator {
 
         UserArticleDAO.setFavorite(Session.getCurrentUser(), a, fav);
 
-        statusMap.compute(a.getId(), (id, ua) -> {
+        statusMap.compute(a.getId(), (_, ua) -> {
             if (ua == null) {
                 ua = new UserArticle(
                         Session.getCurrentUser(), a, fav, false, LocalDateTime.now());
