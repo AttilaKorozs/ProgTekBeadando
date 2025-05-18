@@ -65,11 +65,11 @@ Az adatbázisod jelenleg négy táblából áll, az alábbi szerkezettel:
 
 * **Mezők**
 
-  * `url` VARCHAR(512) – a feed egyedi azonosítója (primer kulcs)
   * `name` VARCHAR(255) – a feed megjelenítendő neve
+  * `url` VARCHAR(512) – a feed egyedi azonosítója (elsődleges kulcs)
   * `refresh_interval_min` INT(11) – frissítés gyakorisága percekben
 
-* **Primér kulcs**: `url`
+* **Elsődleges kulcs**: `url`
 
 ---
 
@@ -77,18 +77,18 @@ Az adatbázisod jelenleg négy táblából áll, az alábbi szerkezettel:
 
 * **Mezők**
 
-  * `id` INT(11) AUTO\_INCREMENT – a cikk egyedi száma (primer kulcs)
+  * `id` INT(11) AUTO_INCREMENT – a cikk egyedi száma (elsődleges kulcs)
   * `feed_url` VARCHAR(512) – hivatkozás a `Feed.url`-re (idegen kulcs)
   * `title` VARCHAR(512) – a cikk címe
   * `link` VARCHAR(1024) – a cikk webcíme
   * `publication_date` DATETIME – megjelenés dátuma/időpontja
   * `content` TEXT – a cikk teljes szövege
 
-* **Primér kulcs**: `id`
+* **Elsődleges kulcs**: `id`
 
 * **Idegen kulcs**:
 
-  * `feed_url` → `Feed(url)` (ON DELETE CASCADE javasolt)
+  * `feed_url` → `Feed(url)` (ON DELETE CASCADE)
 
 ---
 
@@ -96,14 +96,12 @@ Az adatbázisod jelenleg négy táblából áll, az alábbi szerkezettel:
 
 * **Mezők**
 
-  * `username` VARCHAR(100) – a felhasználó azonosítója (primer kulcs)
+  * `username` VARCHAR(100) – a felhasználó azonosítója (elsődleges kulcs)
   * `password_hash` VARCHAR(255) – titkosított jelszó (bcrypt hash)
   * `email` VARCHAR(255) – e-mail cím
-  * `created_at` DATETIME – regisztráció időpontja (alapértelmezett: CURRENT\_TIMESTAMP)
+  * `created_at` DATETIME – regisztráció időpontja (alapértelmezett: CURRENT_TIMESTAMP)
 
-* **Primér kulcs**: `username`
-
-* **Egyedi index**: `email`
+* **Elsődleges kulcs**: `username`
 
 ---
 
@@ -115,9 +113,9 @@ Az adatbázisod jelenleg négy táblából áll, az alábbi szerkezettel:
   * `article_id` INT(11) – hivatkozás az `Article.id`-re (idegen kulcs)
   * `is_favorite` TINYINT(1) DEFAULT 0 – kedvenc státusz
   * `is_read` TINYINT(1) DEFAULT 0 – olvasott státusz
-  * `updated_at` DATETIME DEFAULT CURRENT\_TIMESTAMP ON UPDATE CURRENT\_TIMESTAMP – utolsó módosítás időpontja
+  * `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP – utolsó módosítás időpontja
 
-* **Kompozit primér kulcs**: (`user`, `article_id`)
+* **Kompozit elsődleges kulcs**: (`user`, `article_id`)
 
 * **Idegen kulcsok**:
 
