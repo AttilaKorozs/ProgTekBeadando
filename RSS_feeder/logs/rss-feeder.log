@@ -6,3 +6,10 @@
 2025-05-18 11:08:33.543 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
 2025-05-18 11:17:06.228 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
 2025-05-18 11:20:47.978 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-18 11:28:13.910 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-18 11:28:23.658 [JavaFX Application Thread] INFO  org.rssreader.controller.FeedController - User 'atix' added new feed with URL 'www.asdf.hu'
+2025-05-18 11:31:20.690 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-18 11:34:43.780 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-18 11:34:56.135 [JavaFX Application Thread] INFO  org.rssreader.controller.FeedController - User 'atix' added new feed with URL 'www.atix.hu'
+2025-05-18 11:38:23.218 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-18 11:38:37.541 [JavaFX Application Thread] INFO  org.rssreader.controller.FeedController - User 'atix' added new feed with URL 'www.test.hu'

@@ -21,7 +21,9 @@
     <TextField fx:id="txtEmail" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
     <HBox spacing="10" GridPane.rowIndex="3" GridPane.columnIndex="1" alignment="CENTER_RIGHT">
-        <Button text="Login"    onAction="#handleLogin"/>
+        <Button text="Login"    
+                onAction="#handleLogin"
+                defaultButton="true"/>
         <Button text="Register" onAction="#handleRegister"/>
     </HBox>
 </GridPane>
