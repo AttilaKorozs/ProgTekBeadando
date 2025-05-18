@@ -38,12 +38,12 @@ public class UserArticleDAO {
     }
 
     private static ResultSet getUserData(User user, Article article) {
-        String sql = "SELECT is_favourite, is_read, updated_at, FROM UserArticle WHERE user = ? AND article_id = ?";
+        String sql = "SELECT is_favorite, is_read, updated_at FROM UserArticle WHERE user = ? AND article_id = ?";
         ResultSet rs;
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, user.getUsername());
-            stmt.setInt(1, article.getId());
+            stmt.setInt(2, article.getId());
             rs = stmt.executeQuery();
 
         } catch (Exception e) {

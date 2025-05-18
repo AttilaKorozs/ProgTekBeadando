@@ -8,11 +8,13 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
+
+import org.rssreader.dao.ArticleDAO;
 import org.rssreader.dao.UserArticleDAO;
 import org.rssreader.models.Article;
 import org.rssreader.models.Feed;
 import org.rssreader.models.UserArticle;
-//import org.rssreader.service.ArticleService;
+import org.rssreader.service.ArticleService;
 import org.rssreader.service.FeedService;
 import org.rssreader.service.decorator.ArticleComponent;
 import org.rssreader.service.decorator.BasicArticleComponent;
@@ -32,27 +34,35 @@ import java.util.stream.Collectors;
 public class ArticleController {
 
     // --- Szűrési UI ---
-    @FXML private ChoiceBox<String> choiceFilter;
-    @FXML private TextField txtKeyword;
-    @FXML private DatePicker datePicker;
-    @FXML private Button btnApply;
+    @FXML
+    private ChoiceBox<String> choiceFilter;
+    @FXML
+    private TextField txtKeyword;
+    @FXML
+    private DatePicker datePicker;
+    @FXML
+    private Button btnApply;
 
     // --- Fő tartalom ---
-    @FXML private ListView<Feed> feedList;
-    @FXML private TableView<ArticleComponent> articleTable;
-    @FXML private TableColumn<ArticleComponent, String> colTitle;
-    @FXML private TableColumn<ArticleComponent, LocalDateTime> colDate;
-    @FXML private TableColumn<ArticleComponent, Boolean> colFavorite;
-    @FXML private TableColumn<ArticleComponent, Boolean> colRead;
-    @FXML private TextArea txtContent;
+    @FXML
+    private ListView<Feed> feedList;
+    @FXML
+    private TableView<ArticleComponent> articleTable;
+    @FXML
+    private TableColumn<ArticleComponent, String> colTitle;
+    @FXML
+    private TableColumn<ArticleComponent, LocalDateTime> colDate;
+    @FXML
+    private TableColumn<ArticleComponent, Boolean> colFavorite;
+    @FXML
+    private TableColumn<ArticleComponent, Boolean> colRead;
+    @FXML
+    private TextArea txtContent;
 
     private final FeedService feedService = FeedService.getInstance();
-    //private final ArticleService articleService = new ArticleService();  // ha ArticleService-ben parser a probléma, ott rssParser.parse(...)
+    //private final ArticleService articleService = new ArticleService(); // ha ArticleService-ben parser a probléma, ott
+                                                                        // rssParser.parse(...)
     private List<ArticleComponent> originalArticles;
-
-
-
-
 
     @FXML
     private void onApplyFilter() {
@@ -78,18 +88,14 @@ public class ArticleController {
         btnApply.setOnAction(e -> applyFilter());
 
         // 4. Táblázat oszlopok
-        colTitle.setCellValueFactory(cd ->
-                new ReadOnlyObjectWrapper<>(cd.getValue().getTitle()));
-        colDate.setCellValueFactory(cd ->
-                new ReadOnlyObjectWrapper<>(cd.getValue().getPublicationDate()));
+        colTitle.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue().getTitle()));
+        colDate.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue().getPublicationDate()));
 
-        colFavorite.setCellValueFactory(cd ->
-                new ReadOnlyBooleanWrapper(cd.getValue().isFavorite()));
+        colFavorite.setCellValueFactory(cd -> new ReadOnlyBooleanWrapper(cd.getValue().isFavorite()));
         colFavorite.setCellFactory(CheckBoxTableCell.forTableColumn(colFavorite));
         colFavorite.setEditable(true);
 
-        colRead.setCellValueFactory(cd ->
-                new ReadOnlyBooleanWrapper(cd.getValue().isRead()));
+        colRead.setCellValueFactory(cd -> new ReadOnlyBooleanWrapper(cd.getValue().isRead()));
         colRead.setCellFactory(CheckBoxTableCell.forTableColumn(colRead));
         colRead.setEditable(true);
 
@@ -111,7 +117,8 @@ public class ArticleController {
         feedList.setItems(FXCollections.observableList(feedService.getAllFeeds()));
         feedList.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldF, newF) -> {
-                    if (newF != null) loadArticles(newF);
+                    if (newF != null)
+                        loadArticles(newF);
                 });
 
         // 7. Alapértelmezett feed kiválasztása
@@ -127,10 +134,12 @@ public class ArticleController {
     }
 
     /** Betölti a cikkeket a kiválasztott Feed alapján. */
-    /*private void loadArticles(Feed feed) {
-        originalArticles = articleService.getArticlesByFeed(feed);
-        applyFilter();
-    }*/
+    /*
+     * private void loadArticles(Feed feed) {
+     * originalArticles = articleService.getArticlesByFeed(feed);
+     * applyFilter();
+     * }
+     */
 
     @FXML
     private void loadArticles(Feed feed) {
@@ -146,15 +155,22 @@ public class ArticleController {
         };
 
         fetchTask.setOnSucceeded(evt -> {
-            List<Article> articles = fetchTask.getValue();
+            List<Article> parsedArticles = fetchTask.getValue();
+            List<Article> storedArticles = ArticleDAO.getArticle(feed);
+            List<Article> newArticles = parsedArticles.stream()
+                    .filter(pa -> storedArticles.stream()
+                            .noneMatch(sa -> sa.getTitle().equalsIgnoreCase(pa.getTitle())
+                                    && sa.getLink().equals(pa.getLink())))
+                    .toList();
+
+            newArticles.forEach(ArticleDAO::storeArticle);
+            List<Article> articles = ArticleDAO.getArticle(feed);
             // 2. Lekérdezzük egyszer a teljes státuszlistát
-            List<UserArticle> uaList = UserArticleDAO.getUserArticle(
-                    Session.getCurrentUser(), feed);
+            List<UserArticle> uaList = UserArticleDAO.getUserArticle(Session.getCurrentUser(), feed);
             Map<Integer, UserArticle> statusMap = uaList.stream()
                     .collect(Collectors.toMap(
                             ua -> ua.getArticle().getId(),
-                            ua -> ua
-                    ));
+                            ua -> ua));
 
             // 3. Átalakítjuk ArticleComponent-ekké a cache-elt dekorátorokkal
             originalArticles = articles.stream()
@@ -163,8 +179,8 @@ public class ArticleController {
                     .map(c -> new CachedReadDecorator(c, statusMap))
                     .collect(Collectors.toList());
 
-            applyFilter();               // UI-frissítés (szűrés + table.setItems)
-            btnApply.setDisable(false);  // UI visszaengedése
+            applyFilter(); // UI-frissítés (szűrés + table.setItems)
+            btnApply.setDisable(false); // UI visszaengedése
         });
 
         fetchTask.setOnFailed(evt -> {
