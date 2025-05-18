@@ -31,7 +31,9 @@ public class CachedFavoriteDecorator extends ArticleDecorator {
     @Override
     public void setFavorite(boolean fav) {
         Article a = wrappee.getModel();
+
         UserArticleDAO.setFavorite(Session.getCurrentUser(), a, fav);
+
         statusMap.compute(a.getId(), (id, ua) -> {
             if (ua == null) {
                 ua = new UserArticle(

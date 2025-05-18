@@ -1,8 +1,10 @@
 package org.rssreader.controller;
 
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -91,9 +93,9 @@ public class ArticleController {
         colTitle.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue().getTitle()));
         colDate.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue().getPublicationDate()));
 
-        colFavorite.setCellValueFactory(cd -> new ReadOnlyBooleanWrapper(cd.getValue().isFavorite()));
-        colFavorite.setCellFactory(CheckBoxTableCell.forTableColumn(colFavorite));
-        colFavorite.setEditable(true);
+       // colFavorite.setCellValueFactory(cd -> new ReadOnlyBooleanWrapper(cd.getValue().isFavorite()));
+        //colFavorite.setCellFactory(CheckBoxTableCell.forTableColumn(colFavorite));
+       // colFavorite.setEditable(true);
 
         colRead.setCellValueFactory(cd -> new ReadOnlyBooleanWrapper(cd.getValue().isRead()));
         colRead.setCellFactory(CheckBoxTableCell.forTableColumn(colRead));
@@ -112,6 +114,14 @@ public class ArticleController {
             ac.setRead(e.getNewValue());
             articleTable.refresh();
         });
+
+        colFavorite.setCellValueFactory(cd -> {
+            BooleanProperty prop = new SimpleBooleanProperty(cd.getValue().isFavorite());
+            prop.addListener((obs, oldVal, newVal) -> cd.getValue().setFavorite(newVal));
+            return prop;
+        });
+        colFavorite.setCellFactory(tc -> new CheckBoxTableCell<>());
+        articleTable.setEditable(true);
 
         // 6. Feed lista és kiválasztás
         feedList.setItems(FXCollections.observableList(feedService.getAllFeeds()));
