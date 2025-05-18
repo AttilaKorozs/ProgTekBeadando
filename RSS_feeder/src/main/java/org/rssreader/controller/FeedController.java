@@ -12,6 +12,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
+
+import org.rssreader.dao.FeedDAO;
 import org.rssreader.models.Feed;
 import org.rssreader.service.FeedService;
 
@@ -81,6 +83,7 @@ public class FeedController {
 
         Optional<Feed> result = dialog.showAndWait();
         result.ifPresent(feed -> {
+            FeedDAO.addFeed(feed);
             feedService.addFeed(feed);
             logger.info("User '{}' added new feed with URL '{}'",
                     Session.getCurrentUser().getUsername(),
@@ -92,7 +95,8 @@ public class FeedController {
     @FXML private void onDeleteFeed() {
         Feed selected = feedTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
-            //feedService.deleteFeed(selected.getId());
+            FeedDAO.removeFeed(selected);
+            feedService.deleteFeed(selected.getUri());
             refreshTable();
         }
     }

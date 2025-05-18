@@ -1,9 +1,9 @@
 package org.rssreader.service;
 
+import org.rssreader.dao.FeedDAO;
 import org.rssreader.models.Feed;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,22 +15,15 @@ public class FeedService {
         return INSTANCE;
     }
 
-    private final List<Feed> feeds = new ArrayList<>();
+    private List<Feed> feeds = new ArrayList<>();
 
     public FeedService() {
-        // Kezdeti stub adatok
-        try {
-            feeds.add(new Feed("Example RSS", new URI("https://example.com/rss"), 30));
-            feeds.add(new Feed("News Feed", new URI("https://news.example.com/rss"), 15));
-            feeds.add(new Feed("Real feed", new URI("https://news.un.org/feed/subscribe/en/news/all/rss.xml"), 15));
-        } catch (URISyntaxException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
 
     }
 
     public List<Feed> getAllFeeds() {
+        feeds.clear();
+        feeds.addAll(FeedDAO.getFeedList());
         return Collections.unmodifiableList(feeds);
     }
 
@@ -47,6 +40,6 @@ public class FeedService {
         return getAllFeeds().stream()
                 .filter(f -> f.getUri().equals(uri))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unknown feed URI: "+uri));
+                .orElseThrow(() -> new IllegalArgumentException("Unknown feed URI: " + uri));
     }
 }
