@@ -2,3 +2,7 @@
 2025-05-17 16:00:13.524 [JavaFX Application Thread] INFO  org.rssreader.controller.FeedController - User 'peti' added new feed with URL 'szia.hu'
 2025-05-17 16:00:52.520 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'peti' logged in
 2025-05-17 16:02:34.629 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'peti' logged in
+2025-05-18 11:08:07.384 [JavaFX Application Thread] WARN  org.rssreader.controller.LoginController - Failed login attempt for username 'asdf'
+2025-05-18 11:08:33.543 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-18 11:17:06.228 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-18 11:20:47.978 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in

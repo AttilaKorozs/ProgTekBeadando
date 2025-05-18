@@ -31,7 +31,7 @@ public class FavoriteDecorator extends ArticleDecorator {
         if (fav) {
             UserArticleDAO.setFavorite(Session.getCurrentUser(), a);
         } else {
-            // implementáld a törlést is, ha kell
+            // TODO: implementáld a törlést is, ha kell
         }
     }
 }

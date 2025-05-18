@@ -1,6 +1,5 @@
 package org.rssreader.service.filter;
 
-import org.rssreader.models.Article;
 import org.rssreader.service.decorator.ArticleComponent;
 
 import java.time.LocalDate;

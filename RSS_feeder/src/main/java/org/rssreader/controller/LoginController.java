@@ -26,7 +26,7 @@ public class LoginController {
     @FXML private TextField txtEmail;
 
     // a DAO statikus metódusokat használ
-    private final UserDAO userDAO = new UserDAO();
+    //private final UserDAO userDAO = new UserDAO();
 
     @FXML
     private void handleLogin(ActionEvent event) {
@@ -35,7 +35,7 @@ public class LoginController {
 
         // A DAO authUser(User) metódusát így kell hívni:
         User attempt = new User(username, password, null);
-        User user = userDAO.authUser(attempt);
+        User user = UserDAO.authUser(attempt);
 
         if (user != null) {
             // beállítjuk a session-be
@@ -62,7 +62,7 @@ public class LoginController {
 
         // itt az addUser(User) várt paraméterrel
         User newUser = new User(username, password, email);
-        boolean ok = userDAO.addUser(newUser);
+        boolean ok = UserDAO.addUser(newUser);
 
         if (ok) {
             showAlert(Alert.AlertType.INFORMATION, "Registration", "User registered successfully.");

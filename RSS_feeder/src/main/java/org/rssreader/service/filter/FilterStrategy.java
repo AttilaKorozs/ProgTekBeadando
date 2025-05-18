@@ -1,6 +1,4 @@
 package org.rssreader.service.filter;
-
-import org.rssreader.models.Article;
 import java.util.List;
 
 public interface FilterStrategy<T>{

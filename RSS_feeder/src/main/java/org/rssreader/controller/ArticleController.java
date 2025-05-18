@@ -8,14 +8,11 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.HBox;
-import javafx.util.converter.DefaultStringConverter;
 import org.rssreader.dao.UserArticleDAO;
 import org.rssreader.models.Article;
 import org.rssreader.models.Feed;
 import org.rssreader.models.UserArticle;
-import org.rssreader.service.ArticleService;
+//import org.rssreader.service.ArticleService;
 import org.rssreader.service.FeedService;
 import org.rssreader.service.decorator.ArticleComponent;
 import org.rssreader.service.decorator.BasicArticleComponent;
@@ -27,9 +24,6 @@ import org.rssreader.service.filter.KeywordFilter;
 import org.rssreader.service.filter.TitleFilter;
 import org.rssreader.util.RssParser;
 import org.rssreader.util.Session;
-
-import java.awt.event.ActionEvent;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +47,7 @@ public class ArticleController {
     @FXML private TextArea txtContent;
 
     private final FeedService feedService = FeedService.getInstance();
-    private final ArticleService articleService = new ArticleService();  // ha ArticleService-ben parser a probléma, ott rssParser.parse(...)
+    //private final ArticleService articleService = new ArticleService();  // ha ArticleService-ben parser a probléma, ott rssParser.parse(...)
     private List<ArticleComponent> originalArticles;
 
 
