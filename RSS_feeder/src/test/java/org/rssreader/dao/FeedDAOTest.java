@@ -8,15 +8,15 @@ public class FeedDAOTest {
 
     @Test
     void testAddFeed() {
-        assertEquals(FeedDAO.getFeedList().size(), 0);
+        int feedCount=FeedDAO.getFeedList().size();
         FeedDAO.addFeed(TestData.TestFeed);
-        assertEquals(FeedDAO.getFeedList().size(), 1);
+        assertEquals(FeedDAO.getFeedList().size(), feedCount + 1);
     }
 
     @Test
     void testRemoveFeed() {
-        assertEquals(FeedDAO.getFeedList().size(), 1);
+        int feedCount=FeedDAO.getFeedList().size();
         FeedDAO.removeFeed(TestData.TestFeed);
-        assertEquals(FeedDAO.getFeedList().size(), 0);
+        assertEquals(FeedDAO.getFeedList().size(), feedCount - 1);
     }
 }

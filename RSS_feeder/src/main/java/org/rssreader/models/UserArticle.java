@@ -40,21 +40,21 @@ public class UserArticle {
     }
 
     public void setRead() {
-        if (UserArticleDAO.setRead(user, article))
+        if (UserArticleDAO.setRead(user, article, true))
             isRead=true;
     }
 
     public void unsetRead() {
-        if (UserArticleDAO.setRead(user, article))
+        if (UserArticleDAO.setRead(user, article, false))
             isRead=false;
     }
     public void setFavorite() {
-        if (UserArticleDAO.setFavorite(user, article))
+        if (UserArticleDAO.setFavorite(user, article, true))
             isFavorite=true;
     }
 
     public void unsetFavorite() {
-        if (UserArticleDAO.setFavorite(user, article))
+        if (UserArticleDAO.setFavorite(user, article, false))
             isFavorite=false   ;
     }
 

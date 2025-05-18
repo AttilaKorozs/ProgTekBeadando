@@ -24,10 +24,6 @@ public class ReadDecorator extends ArticleDecorator {
     @Override
     public void setRead(boolean read) {
         Article a = wrappee.getModel();
-        if (read) {
-            UserArticleDAO.setRead(Session.getCurrentUser(), a);
-        } else {
-            // implementáld az olvasott jelölés törlését is, ha szükséges
-        }
+        UserArticleDAO.setRead(Session.getCurrentUser(), a, read);
     }
 }

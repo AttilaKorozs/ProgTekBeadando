@@ -156,15 +156,15 @@ public class ArticleController {
 
         fetchTask.setOnSucceeded(evt -> {
             List<Article> parsedArticles = fetchTask.getValue();
-            List<Article> storedArticles = ArticleDAO.getArticle(feed);
+            List<UserArticle> storedArticles = UserArticleDAO.getUserArticle(Session.getCurrentUser(),feed);
             List<Article> newArticles = parsedArticles.stream()
                     .filter(pa -> storedArticles.stream()
-                            .noneMatch(sa -> sa.getTitle().equalsIgnoreCase(pa.getTitle())
-                                    && sa.getLink().equals(pa.getLink())))
+                            .noneMatch(sa -> sa.getArticle().getTitle().equalsIgnoreCase(pa.getTitle())
+                                    && sa.getArticle().getLink().equals(pa.getLink())))
                     .toList();
 
             newArticles.forEach(ArticleDAO::storeArticle);
-            List<Article> articles = ArticleDAO.getArticle(feed);
+            List<UserArticle> articles = UserArticleDAO.getUserArticle(Session.getCurrentUser(),feed);
             // 2. Lekérdezzük egyszer a teljes státuszlistát
             List<UserArticle> uaList = UserArticleDAO.getUserArticle(Session.getCurrentUser(), feed);
             Map<Integer, UserArticle> statusMap = uaList.stream()
@@ -174,7 +174,7 @@ public class ArticleController {
 
             // 3. Átalakítjuk ArticleComponent-ekké a cache-elt dekorátorokkal
             originalArticles = articles.stream()
-                    .map(a -> new BasicArticleComponent(a))
+                    .map(a -> new BasicArticleComponent(a.getArticle()))
                     .map(c -> new CachedFavoriteDecorator(c, statusMap))
                     .map(c -> new CachedReadDecorator(c, statusMap))
                     .collect(Collectors.toList());

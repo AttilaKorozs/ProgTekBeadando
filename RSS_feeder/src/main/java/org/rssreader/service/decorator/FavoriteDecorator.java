@@ -27,11 +27,6 @@ public class FavoriteDecorator extends ArticleDecorator {
     @Override
     public void setFavorite(boolean fav) {
         Article a = wrappee.getModel();
-        Feed feed = feedService.getFeedByUri(a.getFeedUri());
-        if (fav) {
-            UserArticleDAO.setFavorite(Session.getCurrentUser(), a);
-        } else {
-            // TODO: implementáld a törlést is, ha kell
-        }
+        UserArticleDAO.setFavorite(Session.getCurrentUser(), a, fav);
     }
 }

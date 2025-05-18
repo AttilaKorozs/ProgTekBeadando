@@ -53,10 +53,10 @@ public class UserArticleDAO {
         return rs;
     }
 
-    public static boolean setRead(User user, Article article) {
+    public static boolean setRead(User user, Article article, boolean isRead) {
         String selectSql = "SELECT 1 FROM UserArticle WHERE user = ? AND article_id = ?";
-        String updateSql = "UPDATE UserArticle SET is_read = 1 WHERE user = ? AND article_id = ?";
-        String insertSql = "INSERT INTO UserArticle (user, article_id, is_read, is_favorite) VALUES (?, ?, 1, 0)";
+        String updateSql = "UPDATE UserArticle SET is_read = ? WHERE user = ? AND article_id = ?";
+        String insertSql = "INSERT INTO UserArticle (user, article_id, is_read, is_favorite) VALUES (?, ?, ?, 0)";
         try (Connection conn = DatabaseConnection.getConnection()) {
 
             try (PreparedStatement selectStmt = conn.prepareStatement(selectSql)) {
@@ -66,14 +66,16 @@ public class UserArticleDAO {
                 try (ResultSet rs = selectStmt.executeQuery()) {
                     if (rs.next()) {
                         try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
-                            updateStmt.setString(1, user.getUsername());
-                            updateStmt.setInt(2, article.getId());
+                            updateStmt.setBoolean(1, isRead);
+                            updateStmt.setString(2, user.getUsername());
+                            updateStmt.setInt(3, article.getId());
                             return updateStmt.executeUpdate() > 0;
                         }
                     } else {
                         try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
                             insertStmt.setString(1, user.getUsername());
                             insertStmt.setInt(2, article.getId());
+                            insertStmt.setBoolean(3, isRead);
                             return insertStmt.executeUpdate() > 0;
                         }
                     }
@@ -86,10 +88,10 @@ public class UserArticleDAO {
         }
     }
 
-    public static boolean setFavorite(User user, Article article) {
+    public static boolean setFavorite(User user, Article article, boolean isFavourite) {
         String selectSql = "SELECT is_favorite FROM UserArticle WHERE user = ? AND article_id = ?";
-        String updateSql = "UPDATE UserArticle SET is_favorite = 1 WHERE user = ? AND article_id = ?";
-        String insertSql = "INSERT INTO UserArticle (user, article_id, is_read, is_favorite) VALUES (?, ?, 0, 1)";
+        String updateSql = "UPDATE UserArticle SET is_favorite = ? WHERE user = ? AND article_id = ?";
+        String insertSql = "INSERT INTO UserArticle (user, article_id, is_read, is_favorite) VALUES (?, ?, 0, ?)";
         try (Connection conn = DatabaseConnection.getConnection()) {
 
             try (PreparedStatement selectStmt = conn.prepareStatement(selectSql)) {
@@ -99,14 +101,16 @@ public class UserArticleDAO {
                 try (ResultSet rs = selectStmt.executeQuery()) {
                     if (rs.next()) {
                         try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
-                            updateStmt.setString(1, user.getUsername());
-                            updateStmt.setInt(2, article.getId());
+                            updateStmt.setBoolean(1, isFavourite);
+                            updateStmt.setString(2, user.getUsername());
+                            updateStmt.setInt(3, article.getId());
                             return updateStmt.executeUpdate() > 0;
                         }
                     } else {
                         try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
                             insertStmt.setString(1, user.getUsername());
                             insertStmt.setInt(2, article.getId());
+                            insertStmt.setBoolean(3, isFavourite);
                             return insertStmt.executeUpdate() > 0;
                         }
                     }
