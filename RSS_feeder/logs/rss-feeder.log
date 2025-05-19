@@ -141,3 +141,34 @@
 2025-05-19 06:22:37.240 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
 2025-05-19 06:22:37.261 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedReadDecorator - User 'atix' set read=true for article 'Switch 2-re tarthat a Red Dead Redemption 2?'
 2025-05-19 06:26:16.328 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-19 06:28:20.745 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-19 06:28:29.409 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - User 'atix' set favorite=true for article 'Elég kompakt lett az MSI legfrissebb, Blackwell architektúrás VGA-ja'
+2025-05-19 06:28:30.085 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
+2025-05-19 06:28:30.100 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
+2025-05-19 06:28:30.111 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedReadDecorator - User 'atix' set read=true for article 'Elég kompakt lett az MSI legfrissebb, Blackwell architektúrás VGA-ja'
+2025-05-19 06:29:34.232 [JavaFX Application Thread] INFO  org.rssreader.controller.FeedController - User 'atix' added new feed with URL 'https://github.com/MediaBrowser/Emby.Releases/releases.atom'
+2025-05-19 06:29:39.998 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - User 'atix' set favorite=true for article '4.9.0.59-beta'
+2025-05-19 06:29:41.076 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
+2025-05-19 06:29:41.087 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
+2025-05-19 06:29:41.099 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedReadDecorator - User 'atix' set read=true for article '4.9.0.56-beta'
+2025-05-19 07:54:21.398 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-19 08:04:54.089 [JavaFX Application Thread] WARN  org.rssreader.controller.LoginController - Failed login attempt for username 'atix'
+2025-05-19 08:04:58.006 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-19 08:06:11.619 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-19 08:08:54.419 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - User 'atix' set favorite=true for article '4.9.0.59-beta'
+2025-05-19 08:08:56.408 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
+2025-05-19 08:08:56.520 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
+2025-05-19 08:08:56.538 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedReadDecorator - User 'atix' set read=true for article '4.9.0.59-beta'
+2025-05-19 08:12:27.719 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-19 08:15:49.335 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-19 08:15:52.856 [JavaFX Application Thread] WARN  org.rssreader.service.decorator.CachedFavoriteDecorator - hiba van itt
+2025-05-19 08:15:52.870 [JavaFX Application Thread] WARN  org.rssreader.service.decorator.CachedFavoriteDecorator - hiba van itt
+2025-05-19 08:15:52.885 [JavaFX Application Thread] WARN  org.rssreader.service.decorator.CachedFavoriteDecorator - hiba van itt
+2025-05-19 08:15:52.900 [JavaFX Application Thread] WARN  org.rssreader.service.decorator.CachedFavoriteDecorator - hiba van itt
+2025-05-19 08:15:52.916 [JavaFX Application Thread] WARN  org.rssreader.service.decorator.CachedFavoriteDecorator - hiba van itt
+2025-05-19 08:15:52.932 [JavaFX Application Thread] WARN  org.rssreader.service.decorator.CachedFavoriteDecorator - hiba van itt
+2025-05-19 08:15:52.945 [JavaFX Application Thread] WARN  org.rssreader.service.decorator.CachedFavoriteDecorator - hiba van itt
+2025-05-19 08:15:52.959 [JavaFX Application Thread] WARN  org.rssreader.service.decorator.CachedFavoriteDecorator - hiba van itt
+2025-05-19 08:15:52.971 [JavaFX Application Thread] WARN  org.rssreader.service.decorator.CachedFavoriteDecorator - hiba van itt
+2025-05-19 08:15:52.983 [JavaFX Application Thread] WARN  org.rssreader.service.decorator.CachedFavoriteDecorator - hiba van itt
+2025-05-19 08:19:37.479 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
