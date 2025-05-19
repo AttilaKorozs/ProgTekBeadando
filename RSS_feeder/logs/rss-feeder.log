@@ -130,3 +130,7 @@
 2025-05-18 17:48:39.875 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
 2025-05-18 17:48:39.885 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
 2025-05-18 17:48:39.895 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedReadDecorator - User 'atix' set read=true for article 'Switch 2-re tarthat a Red Dead Redemption 2?'
+2025-05-19 05:54:19.315 [JavaFX Application Thread] WARN  org.rssreader.controller.LoginController - Failed login attempt for username 'atix'
+2025-05-19 05:54:23.165 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-19 05:56:36.393 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-19 05:59:34.401 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in

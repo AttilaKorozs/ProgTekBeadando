@@ -1,52 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
 
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.Button?>
-<AnchorPane xmlns="http://javafx.com/javafx/20"
+<BorderPane xmlns="http://javafx.com/javafx/20"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.rssreader.controller.ArticleController">
-    <children>
-
-
-        <!-- Szűrési sáv -->
-        <HBox spacing="10" layoutX="10" layoutY="10" prefHeight="40" alignment="CENTER_LEFT">
+            fx:controller="org.rssreader.controller.ArticleController"
+            stylesheets="@style.css"
+            styleClass="article-pane">
+    <top>
+        <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 10;">
             <ChoiceBox fx:id="choiceFilter" prefWidth="120"/>
             <TextField fx:id="txtKeyword" promptText="Keyword" visible="false"/>
             <DatePicker fx:id="datePicker" visible="false"/>
             <Button fx:id="btnApply" text="Apply" onAction="#onApplyFilter"/>
         </HBox>
-
-
-        <!-- Feed lista -->
-        <ListView fx:id="feedList" layoutX="10" layoutY="60" prefWidth="150" prefHeight="350"/>
-        <!-- Cikkek táblázat-->
-        <TableView fx:id="articleTable" layoutX="170" layoutY="60" prefWidth="520" prefHeight="250">
-            <columns>
-                <!-- Kedvenc státusz -->
-                <TableColumn fx:id="colFavorite" text="★" prefWidth="40"/>
-                <!-- Cím -->
-                <TableColumn fx:id="colTitle"    text="Title" prefWidth="300"/>
-                <!-- Dátum -->
-                <TableColumn fx:id="colDate"     text="Date"  prefWidth="120"/>
-                <!-- Olvasott státusz -->
-                <TableColumn fx:id="colRead"     text="✓"     prefWidth="40"/>
-            </columns>
-        </TableView>
-        <!-- Cikk tartalom-->
-        <TextArea fx:id="txtContent" layoutX="170" layoutY="320" prefWidth="420" prefHeight="120" wrapText="true"/>
-
-
-
-
-    </children>
-</AnchorPane>
+    </top>
+    <center>
+        <HBox spacing="10" style="-fx-padding: 10;" HBox.hgrow="ALWAYS">
+            <ListView fx:id="feedList" styleClass="feed-list" VBox.vgrow="ALWAYS" HBox.hgrow="NEVER" prefWidth="150"/>
+            <VBox spacing="10" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+                
+                <TableView fx:id="articleTable" styleClass="article-table" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colFavorite" text="★" prefWidth="40"/>
+                        <TableColumn fx:id="colTitle" text="Title" prefWidth="300"/>
+                        <TableColumn fx:id="colDate" text="Date" prefWidth="120"/>
+                        <TableColumn fx:id="colRead" text="✓" prefWidth="40"/>
+                    </columns>
+                </TableView>
+                <TextArea fx:id="txtContent" wrapText="true" styleClass="content-area" prefHeight="120"/>
+            </VBox>
+        </HBox>
+    </center>
+</BorderPane>
