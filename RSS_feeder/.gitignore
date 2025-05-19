@@ -38,4 +38,11 @@ build/
 .DS_Store
 
 ### database Config ###
+<<<<<<< HEAD
 dbConfig.properties
+=======
+dbConfig.properties
+
+*.log
+/logs/
+>>>>>>> 1b0154783cbc706bd6836a891e64bc3f5b7352ec
