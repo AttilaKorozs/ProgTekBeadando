@@ -134,3 +134,10 @@
 2025-05-19 05:54:23.165 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
 2025-05-19 05:56:36.393 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
 2025-05-19 05:59:34.401 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-19 06:03:25.213 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-19 06:22:28.554 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in
+2025-05-19 06:22:34.013 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - User 'atix' set favorite=true for article 'Switch 2-re tarthat a Red Dead Redemption 2?'
+2025-05-19 06:22:37.211 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
+2025-05-19 06:22:37.240 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedFavoriteDecorator - setRead meghívva
+2025-05-19 06:22:37.261 [JavaFX Application Thread] INFO  org.rssreader.service.decorator.CachedReadDecorator - User 'atix' set read=true for article 'Switch 2-re tarthat a Red Dead Redemption 2?'
+2025-05-19 06:26:16.328 [JavaFX Application Thread] INFO  org.rssreader.controller.LoginController - User 'atix' logged in

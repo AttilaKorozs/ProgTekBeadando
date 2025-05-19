@@ -74,9 +74,8 @@ public class LoginController {
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(scene);
-            stage.setMinWidth(600);
+            stage.setMinWidth(800);
             stage.setMinHeight(400);
-            stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Load Error", e.getMessage());

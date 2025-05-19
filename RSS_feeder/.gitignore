@@ -39,5 +39,3 @@ build/
 
 ### database Config ###
 dbConfig.properties
-
-*.log
