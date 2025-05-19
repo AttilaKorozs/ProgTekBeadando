@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FilterStrategyTest {
-    // egy dummy ArticleComponent gyártó helper
+
     private ArticleComponent makeComp(String title, LocalDateTime dt, String content) throws Exception {
         return new BasicArticleComponent(
                 new org.rssreader.models.Article(

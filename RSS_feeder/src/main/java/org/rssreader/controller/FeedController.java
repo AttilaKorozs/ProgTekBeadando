@@ -12,7 +12,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
-
+import org.rssreader.exception.FeedNotFoundException;
 import org.rssreader.dao.FeedDAO;
 import org.rssreader.models.Feed;
 import org.rssreader.service.FeedService;
@@ -95,6 +95,9 @@ public class FeedController {
             FeedDAO.removeFeed(selected);
             feedService.deleteFeed(selected.getUri());
             refreshTable();
+        }
+        else {
+           throw new FeedNotFoundException("Feed not found ");
         }
     }
 }

@@ -40,7 +40,7 @@ class ArticleComponentTest {
         Article a = sampleArticle();
         User u = new User("u", "p", "e");
         Session.setCurrentUser(u);
-        // előkészítjük a cache-et
+
         UserArticle ua = new UserArticle(u, a, true, false, LocalDateTime.now());
         Map<Integer, UserArticle> cache = Map.of(a.getId(), ua);
 
