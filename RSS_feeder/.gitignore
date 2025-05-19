@@ -41,3 +41,4 @@ build/
 dbConfig.properties
 
 *.log
+/logs/

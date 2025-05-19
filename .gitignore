@@ -1,1 +1,5 @@
 RSS_feeder/logs/rss-feeder.log
+/RSS_feeder/logs/
+RSS_feeder/logs/rss-feeder.log
+RSS_feeder/logs/rss-feeder.log
+*.log
