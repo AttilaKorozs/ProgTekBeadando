@@ -22,21 +22,22 @@ public class UserArticleDAO {
         List<Article> articles = ArticleDAO.getArticle(feed);
         List<UserArticle> userArticles = new ArrayList<UserArticle>();
         for (Article article : articles) {
-            ResultSet rs = getUserData(user, article);
-            try {
-                userArticles.add(new UserArticle(user,
-                        article,
-                        rs.getBoolean("is_favorite"),
-                        rs.getBoolean("is_read"),
-                        (rs.getTimestamp("updated_at") == null)
-                                ? LocalDateTime.now()
-                                : rs.getTimestamp("updated_at").toLocalDateTime()));
+
+            try (ResultSet rs = getUserData(user, article)) {
+                if (rs != null && rs.next()) {
+                    userArticles.add(new UserArticle(user,
+                            article,
+                            rs.getBoolean("is_favorite"),
+                            rs.getBoolean("is_read"),
+                            (rs.getTimestamp("updated_at") == null)
+                                    ? LocalDateTime.now()
+                                    : rs.getTimestamp("updated_at").toLocalDateTime()));
+                } else {
+                    userArticles.add(new UserArticle(user, article, false, false, LocalDateTime.now()));
+                }
             } catch (Exception e) {
-                userArticles.add(new UserArticle(user,
-                        article,
-                        false,
-                        false,
-                        LocalDateTime.now()));
+                logger.warn("Hiba a user cikk adatainál: {}", article, e);
+                e.printStackTrace();
             }
         }
         return userArticles;
@@ -47,6 +48,7 @@ public class UserArticleDAO {
         ResultSet rs;
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setString(1, user.getUsername());
             stmt.setInt(2, article.getId());
             rs = stmt.executeQuery();
@@ -62,7 +64,6 @@ public class UserArticleDAO {
     }
 
     public static boolean setRead(User user, Article article, boolean isRead) {
-        logger.info("setRead meghívva");
         String selectSql = "SELECT 1 FROM UserArticle WHERE user = ? AND article_id = ?";
         String updateSql = "UPDATE UserArticle SET is_read = ? WHERE user = ? AND article_id = ?";
         String insertSql = "INSERT INTO UserArticle (user, article_id, is_read, is_favorite) VALUES (?, ?, ?, 0)";

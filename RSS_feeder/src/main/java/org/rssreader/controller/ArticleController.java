@@ -124,7 +124,6 @@ public class ArticleController {
                 });
     }
 
-
     @FXML
     private void loadArticles(Feed feed) {
         btnApply.setDisable(true);
@@ -139,27 +138,32 @@ public class ArticleController {
 
         fetchTask.setOnSucceeded(_ -> {
             List<Article> parsedArticles = fetchTask.getValue();
-            List<UserArticle> storedArticles = UserArticleDAO.getUserArticle(Session.getCurrentUser(),feed);
+            List<Article> storedArticles = ArticleDAO.getArticle(feed);
+
             List<Article> newArticles = parsedArticles.stream()
                     .filter(pa -> storedArticles.stream()
-                            .noneMatch(sa -> sa.getArticle().getTitle().equalsIgnoreCase(pa.getTitle())
-                                    && sa.getArticle().getLink().equals(pa.getLink())))
+                            .noneMatch(sa -> sa.getTitle().equalsIgnoreCase(pa.getTitle())
+                                    && sa.getLink().equals(pa.getLink())))
                     .toList();
 
             newArticles.forEach(ArticleDAO::storeArticle);
-            List<UserArticle> articles = UserArticleDAO.getUserArticle(Session.getCurrentUser(),feed);
+            List<UserArticle> articles = UserArticleDAO.getUserArticle(Session.getCurrentUser(), feed);
+
             Map<Integer, UserArticle> statusMap = articles.stream()
                     .collect(Collectors.toMap(
                             ua -> ua.getArticle().getId(),
                             ua -> ua));
 
             originalArticles = articles.stream()
-                    .map(a -> new BasicArticleComponent(a.getArticle()))
-                    .map(c -> new CachedFavoriteDecorator(c, statusMap))
-                    .map(c -> new CachedReadDecorator(c, statusMap))
+                    .map(ua -> ua.getArticle())
+                    .map(article -> {
+                        BasicArticleComponent basic = new BasicArticleComponent(article);
+                        CachedFavoriteDecorator favorite = new CachedFavoriteDecorator(basic, statusMap);
+                        return new CachedReadDecorator(favorite, statusMap);
+                    })
                     .collect(Collectors.toList());
 
-            applyFilter(); 
+            applyFilter();
             btnApply.setDisable(false);
         });
 
